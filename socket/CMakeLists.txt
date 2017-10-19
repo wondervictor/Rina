@@ -2,9 +2,17 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-aux_source_directory(. DIR_LIB_SRCS)
+project(socket_test)
 
+set(DIR_LIB_SRCS socket.cpp)
+
+#aux_source_directory(. DIR_LIB_SRCS)
 add_library(Socket ${DIR_LIB_SRCS})
+
+add_executable(socket_test test_main.cpp)
+
+target_link_libraries(socket_test Socket)
+
 
 
 

@@ -8,8 +8,8 @@
 #define RINA_SOCKET_H
 #include <string>
 #include <netdb.h>
-#include <cstdio>
 #include <sys/socket.h>
+
 
 
 
@@ -37,6 +37,12 @@ class SocketError{
 
 class UserAddr {
 
+ public:
+  UserAddr(int port, sockaddr_in sockAddr, int sockfd):sockfd(sockfd),port(port),sockAddr(sockAddr){};
+ private:
+  int sockfd;
+  int port;
+  sockaddr_in sockAddr;
 };
 
 /**
@@ -79,9 +85,11 @@ class ServerSocket: public Socket {
   void stopServer(SocketError* error);
   void send(const Message& buf, const UserAddr& user, SocketError* error);
   void recv(Message& buf, const UserAddr& user, SocketError* error);
+  // void setAddr(UserAddr newAddr) { this->serverAddr = newAddr; }
+  UserAddr& getAddr() const { return serverAddr;}
 
  private:
-  sockaddr_in serverAddr;
+  UserAddr serverAddr;
 
 };
 
@@ -94,12 +102,13 @@ class ClientSocket: public Socket {
   void connect(const UserAddr& serverAddr, SocketError* error)
   void send(const Message& buf, const UserAddr& user, SocketError* error);
   void recv(Message& buf, const UserAddr& user, SocketError* error);
-
   void stop(SocketError* error);
+  //void setAddr(UserAddr newAddr) { this->clientAddr = newAddr; }
+  UserAddr& getAddr() const { return clientAddr;}
+
 
  private:
-  sockaddr_in serverAddr;
-
+  UserAddr clientAddr;
 
 };
 
