@@ -7,20 +7,23 @@ Computer Networks Course Project
 
 **1.Network**
 
-[ ] Socket
+- [ ] Socket
 
-[ ] Central Server
+- [ ] Central Server
 
-[ ] Client
+- [ ] Client
 
+**2. Thread**
 
-**2.Graphic User Interface**
+- [ ] Thread Class
 
-[ ] Login
+**3.Graphic User Interface**
 
-[ ] Chatting
+- [ ] Login
 
-[ ] Online List
+- [ ] Chatting
+
+- [ ] Online List
 
 
 ## Licence

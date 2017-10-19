@@ -53,6 +53,7 @@ class Message {
  public:
   size_t size() const { return msgSize; }
   Message(void* buf, size_t bufSize):msgSize(bufSize),buf(buf) {};
+  void* content() { return buf; }
 
  private:
   size_t msgSize;
@@ -98,7 +99,7 @@ class ClientSocket: public Socket {
  public:
   ClientSocket()= default;
   void init(SocketError* error);
-  void connect(const UserAddr& serverAddr, SocketError* error)
+  void conn(const UserAddr& serverAddr, SocketError* error)
   void send(const Message& buf, const UserAddr& user, SocketError* error);
   void recv(Message& buf, const UserAddr& user, SocketError* error);
   void stop(SocketError* error);
