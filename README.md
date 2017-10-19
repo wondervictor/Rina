@@ -3,18 +3,23 @@ Computer Networks Course Project
 
 ## Introduction
 
-##TODO
+## TODO
 
 **1.Network**
+
 [ ] Socket
+
 [ ] Central Server
+
 [ ] Client
 
 
 **2.Graphic User Interface**
 
 [ ] Login
+
 [ ] Chatting
+
 [ ] Online List
 
 

@@ -50,7 +50,7 @@ void ServerSocket::startServer(SocketError *error) {
     int client_fd = accept(this->serverAddr.sockfd, (sockaddr* )&remoteAddr, (socklen_t* )&sinSize);
     CHECK(client_fd, -1, {error = new SocketError(0, "Failed accepting socket");});
 
-    
+
   }
 
 }
