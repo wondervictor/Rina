@@ -32,6 +32,10 @@
 *.out
 *.app
 
+# Python
+.pyc
+
 # CLion
+.vscode
 .idea
 cmake-build-debug
