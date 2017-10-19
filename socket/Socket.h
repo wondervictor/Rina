@@ -39,7 +39,6 @@ class UserAddr {
 
  public:
   UserAddr(int port, sockaddr_in sockAddr, int sockfd):sockfd(sockfd),port(port),sockAddr(sockAddr){};
- private:
   int sockfd;
   int port;
   sockaddr_in sockAddr;
