@@ -6,8 +6,6 @@ int main(int argc, char* argv[]) {
 
   LOG_WARN("dwagf %d", 10)
   LOG_INFO("dwagf %d", 10)
-  LOG_INFO("Hello")
-
 
 
   return 0;

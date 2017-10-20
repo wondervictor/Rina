@@ -20,22 +20,22 @@
 #define INFO      "[WARNING]"
 #define NEW_LINE  "\n"
 
-#define LOG_WARN(format, ...)   {  printf(RED); \
-                                    printf(__TIME__); \
-                                    printf(WARN);\
-                                    printf(NONE); \
-                                    printf(format,__VA_ARGS__);   \
-                                    printf(NEW_LINE); \
-                                }
+#define LOG_WARN(...)   { printf(RED); \
+                          printf(__TIME__); \
+                          printf(WARN);\
+                          printf(NONE); \
+                          printf(__VA_ARGS__);   \
+                          printf(NEW_LINE); \
+                        }
 
 
 
-#define LOG_INFO(format, ...)   {  printf(GREEN); \
-                                    printf(__TIME__); \
-                                    printf(INFO); \
-                                    printf(NONE); \
-                                    printf(format, __VA_ARGS__);   \
-                                    printf(NEW_LINE); \
-                                }
+#define LOG_INFO(...)   { printf(GREEN); \
+                          printf(__TIME__); \
+                          printf(INFO); \
+                          printf(NONE); \
+                          printf(__VA_ARGS__);   \
+                          printf(NEW_LINE); \
+                        }
 
 #endif //RINA_LOG_H

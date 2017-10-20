@@ -53,7 +53,7 @@ class Message {
  public:
   size_t size() const { return msgSize; }
   Message(void* buf, size_t bufSize):msgSize(bufSize),buf(buf) {};
-  void* content() { return buf; }
+  void* content() const { return buf; }
 
  private:
   size_t msgSize;
@@ -70,8 +70,8 @@ class Socket {
 
   Socket();
   virtual void init(SocketError* error);
-  virtual void send(const Message& buf, const UserAddr& user, SocketError* error);
-  virtual void recv(Message& buf, const UserAddr& user, SocketError* error);
+  virtual void sendMessage(const Message& buf, SocketError* error);
+  virtual void recvMessage(Message& buf, const UserAddr& user, SocketError* error);
   virtual ~Socket();
 
 };
@@ -83,8 +83,8 @@ class ServerSocket: public Socket {
   void init(SocketError* error);
   void startServer(SocketError* error);
   void stopServer(SocketError* error);
-  void send(const Message& buf, const UserAddr& user, SocketError* error);
-  void recv(Message& buf, const UserAddr& user, SocketError* error);
+  void sendMessage(const Message& buf, const UserAddr& user, SocketError* error);
+  void recvMessage(Message& buf, const UserAddr& user, SocketError* error);
   // void setAddr(UserAddr newAddr) { this->serverAddr = newAddr; }
   UserAddr& getAddr() const { return serverAddr;}
 
@@ -99,9 +99,9 @@ class ClientSocket: public Socket {
  public:
   ClientSocket()= default;
   void init(SocketError* error);
-  void conn(const UserAddr& serverAddr, SocketError* error)
-  void send(const Message& buf, const UserAddr& user, SocketError* error);
-  void recv(Message& buf, const UserAddr& user, SocketError* error);
+  void conn(const UserAddr& serverAddr, SocketError* error);
+  void sendMessage(const Message& buf, SocketError* error);
+  void recvMessage(Message& buf, const UserAddr& user, SocketError* error);
   void stop(SocketError* error);
   //void setAddr(UserAddr newAddr) { this->clientAddr = newAddr; }
   UserAddr& getAddr() const { return clientAddr;}

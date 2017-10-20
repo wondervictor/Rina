@@ -13,7 +13,7 @@
 #include <arpa/inet.h>
 
 #define CHECK(x, m, handle) { if (x) == (m) { handle; return;}}
-
+#define MAX_BUF_SIZE 1024
 
 #include "../log/log.h"
 
@@ -58,6 +58,15 @@ void ServerSocket::startServer(SocketError *error) {
 
 }
 
+void ServerSocket::sendMessage(const Message &buf, const UserAddr &user, SocketError *error) {
+
+}
+
+void ServerSocket::recvMessage(Message &buf, const UserAddr &user, SocketError *error) {
+
+
+}
+
 void ServerSocket::stopServer(SocketError *error) {
 
 }
@@ -80,6 +89,24 @@ void ClientSocket::init(SocketError *error) {
 
   LOG_INFO("Client Socket init")
 
+}
+
+void ClientSocket::sendMessage(const Message &buf, SocketError *error) {
+  if (clientAddr.sockfd != -1) {
+    ssize_t sendFlag = send(clientAddr.sockfd, buf.content(), buf.size(), 0);
+    LOG_INFO("Client Send Flag %u", sendFlag)
+  } else {
+    LOG_WARN("Socket Not Init")
+  }
+}
+
+void ClientSocket::recvMessage(Message &buf, const UserAddr &user, SocketError *error) {
+  ssize_t recvByteCount = 0;
+  void* bufMem = malloc(sizeof(char)*MAX_BUF_SIZE);
+  if (clientAddr.sockfd != -1) {
+    recvByteCount = recv(clientAddr.sockfd, bufMem, MAX_BUF_SIZE, 0);
+    
+  }
 }
 
 void ClientSocket::stop(SocketError *error) {
