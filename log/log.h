@@ -16,11 +16,12 @@
 #define CYAN      "\e[0;36m"
 #define GRAY      "\e[0;37m"
 
-#define WARN      "[WARNING]"
-#define INFO      "[INFO]"
-#define NEW_LINE  "\n"
+#define WARN        "[WARNING]"
+#define INFO        "[INFO]"
+#define ERROR       "[ERROR]"
+#define NEW_LINE    "\n"
 
-#define LOG_WARN(...)   { printf(RED); \
+#define LOG_WARN(...)   { printf(PURPLE); \
                           printf(__TIME__); \
                           printf(WARN);\
                           printf(NONE); \
@@ -28,6 +29,13 @@
                           printf(NEW_LINE); \
                         }
 
+#define LOG_ERROR(...)  { printf(RED); \
+                          printf(__TIME__); \
+                          printf(ERROR);\
+                          printf(NONE); \
+                          printf(__VA_ARGS__);   \
+                          printf(NEW_LINE); \
+                        }
 
 
 #define LOG_INFO(...)   { printf(GREEN); \

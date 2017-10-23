@@ -13,6 +13,8 @@
 #include <arpa/inet.h>
 #include <thread>
 
+#define SOCKET_ERROR  (-1)
+
 #define CHECK(x, m, handle) if ((x) == (m)) { \
                               handle; \
                               return -1; \
@@ -23,129 +25,126 @@
 
 namespace Rina {
 
+// server socket init
 int ServerSocket::init(int port) {
   LOG_INFO("Server Init")
   sockaddr_in serverSockAddr;
   int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
-  CHECK(sockfd, -1, LOG_WARN("Server Socket Init Failed"))
-
-
-
-
-
-}
-
-
-int ServerSocket::init1() {
-  LOG_INFO("Server Init")
-  int port = 23333;
-  sockaddr_in serverSockAddr;
-  int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-  // CHECK(sockfd, -1, {error = new SocketError(0, "Failed creating socket");});
+  CHECK(sockfd, SOCKET_ERROR, LOG_ERROR("Server Socket Init Failed"))
   serverSockAddr.sin_addr.s_addr = INADDR_ANY;
   serverSockAddr.sin_port=htons(port);
   serverSockAddr.sin_family = AF_INET;
   bzero((serverSockAddr.sin_zero), 8);
-
-  UserAddr user(port, serverSockAddr, sockfd);
-  this->serverAddr = user;
-
-  int flag = bind(this->serverAddr.sockfd, (sockaddr* )&(this->serverAddr.sockAddr), sizeof(sockaddr));
-  // CHECK(flag, -1, {error = new SocketError(0, "Failed binding socket");});
-
+  this->port = port;
+  this->sockfd = sockfd;
+  this->serverAddr = serverSockAddr;
+  int flag = bind(sockfd, (sockaddr* )&serverSockAddr, sizeof(sockaddr));
+  CHECK(flag, SOCKET_ERROR, LOG_ERROR("Server Socket Bind Failed"))
+  LOG_INFO("Server Socket Init Success")
+  return 1;
 }
 
-void handleMessage(int user) {
-  char buf[1000];
-  while(1) {
-    if (recv(user, buf, 1000, 0) != -1) {
-      LOG_INFO("Server Recevied from [%d] Message: %s", user, buf)
-      send(user, buf, sizeof(buf), 0);
+// start server
+int ServerSocket::startServer() {
+  LOG_INFO("Stating The Server...")
+  // Max Connecting
+  int flag = listen(this->sockfd, this->maxConn);
+  CHECK(flag, SOCKET_ERROR, LOG_ERROR("Server Socket Listen Failed"));
+  return 1;
+}
+
+// send message
+int ServerSocket::sendMessage(int sockfd, void *buf, size_t size) {
+  ssize_t sendSize = send(sockfd, buf, size, 0);
+  CHECK(sendSize, SOCKET_ERROR, LOG_ERROR("Server Socket Send Error"))
+  return 1;
+}
+
+long ServerSocket::recvMessage(int sockfd, void *buf, size_t size) {
+  ssize_t recvSize = recv(sockfd, buf, size, 0);
+  CHECK(recvSize, SOCKET_ERROR, LOG_ERROR("Server Socket Recv Error"))
+  return recvSize;
+}
+
+int ServerSocket::acceptConn(sockaddr_in *clientAddr) {
+  int sinsize;
+  int clientfd = accept(this->sockfd, (sockaddr* )&clientAddr, (socklen_t* )&sinsize);
+  CHECK(clientfd, SOCKET_ERROR, LOG_ERROR("Server Accept Error"))
+  this->clients.push_back(clientfd);
+  LOG_INFO("Server Add Client: %d", clientfd)
+  return clientfd;
+}
+
+int ServerSocket::broadcast(void *buf, size_t size) {
+  int sum = 0;
+  for(auto clientfd: this->clients) {
+    int flag = sendMessage(clientfd, buf, size);
+    if (flag == 1) {
+      sum ++;
+    } else {
+      LOG_WARN("Server Send: %d Failed", clientfd);
     }
   }
-}
-
-int ServerSocket::startServer() {
-  LOG_INFO("Stating the server...")
-
-  // Max Connecting
-  int flag = listen(this->serverAddr.sockfd, 10);
-  // CHECK(flag, -1, {error = new SocketError(0, "Failed listening socket");});
-  int sinSize = 0;
-  sockaddr_in remoteAddr;
-  while(1) {
-    sinSize = sizeof(sockaddr_in);
-    int clientFd = accept(this->serverAddr.sockfd, (sockaddr* )&remoteAddr, (socklen_t* )&sinSize);
-    // CHECK(clientFd, -1, {error = new SocketError(0, "Failed accepting socket");})
-
-
-
-  }
-
-}
-
-int ServerSocket::sendMessage(const Message &buf, const UserAddr &user) {
-
-}
-
-int ServerSocket::recvMessage(Message &buf, const UserAddr &user) {
-
-
+  return sum;
 }
 
 int ServerSocket::stopServer() {
-
+  LOG_INFO("Server Stop")
+  close(this->sockfd);
+  return 1;
 }
 
-int ClientSocket::init() {
-  // IP Address
-  in_addr_t clientIP = inet_addr("127.0.0.1");
-  int clientPort = 19845;
 
+int ClientSocket::init(int port) {
+  in_addr_t clientIP = inet_addr("127.0.0.1");
   int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-  // CHECK(sockfd, -1, {error = new SocketError(0, "Failed creating socket");});
+  CHECK(sockfd, -1, LOG_ERROR("Client Socket Init Failed"))
+
   sockaddr_in clientSockAddr;
-  clientSockAddr.sin_port = htons(clientPort);
+  clientSockAddr.sin_port = htons(port);
   clientSockAddr.sin_family = AF_INET;
   clientSockAddr.sin_addr.s_addr = clientIP;
   int flag = bind(sockfd, (sockaddr* )&clientSockAddr, sizeof(sockaddr));
-  // CHECK(flag, -1, {error = new SocketError(0, "Failed binding socket");})
-  UserAddr user(clientPort, clientSockAddr, sockfd);
-  this->clientAddr = user;
-
-  LOG_INFO("Client Socket init")
-
+  CHECK(flag, SOCKET_ERROR, LOG_ERROR("Client Socket Bind Error"))
+  this->sockfd = sockfd;
+  this->port = port;
+  this->clientAddr = clientSockAddr;
+  LOG_INFO("Client Socket Init Success")
+  return 1;
 }
 
-int ClientSocket::sendMessage(const Message &buf) {
-  if (clientAddr.sockfd != -1) {
-    ssize_t sendFlag = send(clientAddr.sockfd, buf.content(), buf.size(), 0);
-    LOG_INFO("Client Send Flag %u", sendFlag)
-  } else {
-    LOG_WARN("Socket Not Init")
-  }
+
+int ClientSocket::sendMessage(void *buf, size_t size) {
+  ssize_t sendSize = send(sockfd, buf, size, 0);
+  CHECK(sendSize, SOCKET_ERROR, LOG_ERROR("Client Socket Send Error"))
+  return 1;
 }
 
-int ClientSocket::recvMessage(Message &buf, const UserAddr &user) {
-  ssize_t recvByteCount = 0;
-  void* bufMem = malloc(sizeof(char)*MAX_BUF_SIZE);
-  if (clientAddr.sockfd != -1) {
-    recvByteCount = recv(clientAddr.sockfd, bufMem, MAX_BUF_SIZE, 0);
-
-  }
+long ClientSocket::recvMessage(void *buf, size_t size) {
+  ssize_t recvSize = recv(sockfd, buf, size, 0);
+  CHECK(recvSize, SOCKET_ERROR, LOG_ERROR("Client Socket Recv Error"))
+  return recvSize;
 }
 
 int ClientSocket::stop() {
-
+  close(this->sockfd);
+  LOG_INFO("Socket Close")
+  return 1;
 }
 
-int ClientSocket::conn(const UserAddr &serverAddr) {
-  sockaddr_in serverSockAddr = serverAddr.sockAddr;
+int ClientSocket::conn(const std::string& serverIPStr, int port) {
+  in_addr_t serverIP = inet_addr(serverIPStr.c_str());
+  sockaddr_in server;
+  server.sin_addr.s_addr = serverIP;
+  server.sin_family = AF_INET;
+  server.sin_port = htons(port);
 
-  int flag = connect(this->clientAddr.sockfd, (sockaddr* )&serverSockAddr, sizeof(sockaddr));
-  // CHECK(flag, -1, {error = new SocketError(0, "Failed creating socket");});
-  LOG_INFO("Connected to the server successfully!")
+  int flag = connect(this->sockfd, (sockaddr* )&server, sizeof(sockaddr));
+  CHECK(flag, SOCKET_ERROR, LOG_ERROR("Client Connect %s Failed", serverIPStr))
+  LOG_INFO("Client Connect %s Successed", serverIPStr)
+  this->connectAddr = server;
+  return 1;
 }
 
 }
