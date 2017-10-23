@@ -7,6 +7,8 @@
 #ifndef RINA_THREAD_H
 #define RINA_THREAD_H
 
+#include <thread>
+
 namespace Rina {
 
 
@@ -17,6 +19,9 @@ class Thread {
 };
 
 class ThreadManager{
+
+
+
 
 
 };

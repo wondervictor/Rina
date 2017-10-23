@@ -17,7 +17,7 @@
 #define GRAY      "\e[0;37m"
 
 #define WARN      "[WARNING]"
-#define INFO      "[WARNING]"
+#define INFO      "[INFO]"
 #define NEW_LINE  "\n"
 
 #define LOG_WARN(...)   { printf(RED); \

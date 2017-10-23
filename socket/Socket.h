@@ -20,19 +20,26 @@ namespace Rina {
  * @class SockerError
  * @brief Socket Error Info
  * */
-class SocketError{
 
- public:
-  SocketError() = default;
-  SocketError(int id, std::string message):id(id),message(message) {}
-  std::string& msg() const { return message; }
 
- private:
-  int id;
-  std::string message;
+enum SocketError{
+
 
 };
 
+//class SocketError{
+//
+// public:
+//  SocketError() = default;
+//  SocketError(int id, std::string message):id(id),message(message) {}
+//  std::string& msg() const { return message; }
+//
+// private:
+//  int id;
+//  std::string message;
+//
+//};
+//
 
 
 class UserAddr {
@@ -44,72 +51,48 @@ class UserAddr {
   sockaddr_in sockAddr;
 };
 
-/**
- * @class Message
- * @brief 定义发送消息
- * */
-class Message {
-
- public:
-  size_t size() const { return msgSize; }
-  Message(void* buf, size_t bufSize):msgSize(bufSize),buf(buf) {};
-  void* content() const { return buf; }
-
- private:
-  size_t msgSize;
-  void* buf;
-
-};
 
 /**
  * @class Socket
  * @brief Simple Package for Socket
  * */
-class Socket {
- public:
 
-  Socket();
-  virtual void init(SocketError* error);
-  virtual void sendMessage(const Message& buf, SocketError* error);
-  virtual void recvMessage(Message& buf, const UserAddr& user, SocketError* error);
-  virtual ~Socket();
 
-};
-
-class ServerSocket: public Socket {
+/**
+ * @class ServerSocket
+ * @brief Server Socket
+ * */
+class ServerSocket {
 
  public:
   ServerSocket()= default;
-  void init(SocketError* error);
-  void startServer(SocketError* error);
-  void stopServer(SocketError* error);
-  void sendMessage(const Message& buf, const UserAddr& user, SocketError* error);
-  void recvMessage(Message& buf, const UserAddr& user, SocketError* error);
-  // void setAddr(UserAddr newAddr) { this->serverAddr = newAddr; }
-  UserAddr& getAddr() const { return serverAddr;}
+  int init(int port);
+  int startServer();
+  int stopServer();
+  int sendMessage(int sockfd, void* buf, size_t size);
+  int recvMessage(int sockfd, void* buf, size_t size);
+  int acceptConn(sockaddr*clientAddr);
 
  private:
-  UserAddr serverAddr;
+  int sockfd;
+  int clientfds;
 
 };
 
 
-class ClientSocket: public Socket {
+class ClientSocket {
 
  public:
   ClientSocket()= default;
-  void init(SocketError* error);
-  void conn(const UserAddr& serverAddr, SocketError* error);
-  void sendMessage(const Message& buf, SocketError* error);
-  void recvMessage(Message& buf, const UserAddr& user, SocketError* error);
-  void stop(SocketError* error);
-  //void setAddr(UserAddr newAddr) { this->clientAddr = newAddr; }
-  UserAddr& getAddr() const { return clientAddr;}
-
+  int init(int port);
+  int conn(std::string server, int port);
+  int sendMessage(void* buf, size_t size);
+  int recvMessage(void* buf, size_t size);
+  int stop();
 
  private:
-  UserAddr clientAddr;
-
+  int sockfd;
+  int connfd;
 };
 
 }
