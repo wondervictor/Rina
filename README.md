@@ -7,7 +7,7 @@ Computer Networks Course Project
 
 **1.Network**
 
-- [ ] Socket
+- [x] Socket
 
 - [ ] Central Server
 

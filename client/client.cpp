@@ -1,5 +1,8 @@
-//
-// Created by 程天恒 on 2017/10/23.
-//
+/**
+ * @brief Client Application
+ * @author Vic Chan
+ * @date 2017-10-23
+ * */
+
 
 #include "client.h"

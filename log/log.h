@@ -1,6 +1,10 @@
-//
-// Created by VicChan on 2017/10/19.
-//
+/**
+ * @brief Log
+ * @author Vic Chan
+ * @date 2017-10-23
+ * */
+
+
 
 #ifndef RINA_LOG_H
 #define RINA_LOG_H

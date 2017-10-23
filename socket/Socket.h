@@ -1,8 +1,9 @@
 /**
- * Author: Vic Chan
- * Date: 2017/10/13
- *
- **/
+ * @brief Socket
+ * @author Vic Chan
+ * @date 2017-10-23
+ * */
+
 
 #ifndef RINA_SOCKET_H
 #define RINA_SOCKET_H
@@ -41,6 +42,7 @@ class ServerSocket {
   long recvMessage(int sockfd, void* buf, size_t size);
   int acceptConn(sockaddr_in* clientAddr);
   int broadcast(void* buf, size_t size);
+  std::vector<int> getClients();
 
  private:
   sockaddr_in serverAddr;

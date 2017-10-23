@@ -1,8 +1,9 @@
 /**
- * Author: Vic Chan
- * Date: 2017/10/13
- *
- **/
+ * @brief Socket
+ * @author Vic Chan
+ * @date 2017-10-23
+ * */
+
 
 #include "Socket.h"
 #include <cstdio>
@@ -93,6 +94,10 @@ int ServerSocket::stopServer() {
   LOG_INFO("Server Stop")
   close(this->sockfd);
   return 1;
+}
+
+std::vector<int> ServerSocket::getClients() {
+  return this->clients;
 }
 
 

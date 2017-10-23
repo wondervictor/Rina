@@ -23,10 +23,12 @@ int main(int argc, char* argv[]) {
     exit(-1);
   }
 
-  CHECK(-1, -1, LOG_WARN("Equa"))
-
   if (strcmp(argv[1], "server") == 0) {
     LOG_INFO("Run as Server")
+
+
+
+
   } else if (strcmp(argv[1], "client") == 0) {
     LOG_INFO("Run as Client")
   } else {
