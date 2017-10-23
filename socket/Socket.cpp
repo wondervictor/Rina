@@ -141,8 +141,8 @@ int ClientSocket::conn(const std::string& serverIPStr, int port) {
   server.sin_port = htons(port);
 
   int flag = connect(this->sockfd, (sockaddr* )&server, sizeof(sockaddr));
-  CHECK(flag, SOCKET_ERROR, LOG_ERROR("Client Connect %s Failed", serverIPStr))
-  LOG_INFO("Client Connect %s Successed", serverIPStr)
+  CHECK(flag, SOCKET_ERROR, LOG_ERROR("Client Connect %s Failed", serverIPStr.c_str()))
+  LOG_INFO("Client Connect %s Successed", serverIPStr.c_str())
   this->connectAddr = server;
   return 1;
 }
