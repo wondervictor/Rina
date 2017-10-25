@@ -9,6 +9,9 @@
 #ifndef RINA_SERVER_H
 #define RINA_SERVER_H
 
+#include "../socket/Socket.h"
+#include "../thread/Thread.h"
+
 namespace Rina {
 
 /**
@@ -16,6 +19,17 @@ namespace Rina {
  * */
 class RinaServer {
 
+ public:
+  RinaServer()= default;
+
+
+  int init(int port);
+  int start();
+  int stop();
+
+
+ private:
+  ThreadManager threadManager;
 
 };
 
