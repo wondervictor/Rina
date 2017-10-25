@@ -140,7 +140,7 @@ int ClientSocket::conn(const std::string& serverIPStr, int port) {
   server.sin_family = AF_INET;
   server.sin_port = htons(port);
 
-  int flag = connect(this->sockfd,(const struct sockaddr *)&server,(socklen_t)sizeof(struct sockaddr));
+  int flag = connect(this->sockfd,(const struct sockaddr *)&server,(socklen_t)sizeof(server));
 
   //EINVAL 22
 //The address_len argument is not a valid length for the address family;

@@ -32,8 +32,8 @@ int main(int argc, char* argv[]) {
     char buf[50];
     sockaddr_in* clientAddr;
 
-    ServerSocket Server=ServerSocket(2334, 20);
-    int sockfd = Server.init(2334);
+    ServerSocket Server=ServerSocket(23333, 20);
+    int sockfd = Server.init(23333);
     int start = Server.startServer();
     int accept = Server.acceptConn(clientAddr);
     long recvSize=Server.recvMessage(accept,(void*) buf,50);
@@ -47,8 +47,8 @@ int main(int argc, char* argv[]) {
     char buf[50];
     ClientSocket Client=ClientSocket();
 
-    int inita = Client.init(5555);
-    int con = Client.conn((const std::string&) "127.0.0.1" ,4567);
+    int inita = Client.init(15555);
+    int con = Client.conn((const std::string&)argv[2], 23333);
 
     fgets(buf,50,stdin);
     //printf("%s\n",buf);
