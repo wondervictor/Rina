@@ -26,10 +26,14 @@ class RinaServer {
   int init(int port);
   int start();
   int stop();
+  int login();
+  int logout();
 
 
  private:
   ThreadManager threadManager;
+  void handle();
+  ServerSocket* serverSocket;
 
 };
 

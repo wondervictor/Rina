@@ -28,9 +28,6 @@ class ThreadManager {
   int threadNum;
 
 
-
-
-
 };
 
 }

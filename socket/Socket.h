@@ -12,6 +12,14 @@
 #include <sys/socket.h>
 #include <vector>
 
+#define CHECK(x, m, handle) if ((x) == (m)) { \
+                              handle; \
+                              return -1; \
+                            }
+
+#define SOCKET_ERROR  (-1)
+
+
 namespace Rina {
 
 
@@ -25,6 +33,13 @@ enum SocketError{
 
 };
 
+
+enum SocketState {
+  Uninitialized=0,
+  Running=1,
+  Stopped=2,
+  Error=3
+};
 
 /**
  * @class ServerSocket
@@ -43,8 +58,11 @@ class ServerSocket {
   int acceptConn(sockaddr_in* clientAddr);
   int broadcast(void* buf, size_t size);
   std::vector<int> getClients();
+  SocketState getState() const { return state; }
+
 
  private:
+  SocketState state;
   sockaddr_in serverAddr;
   int sockfd;
   int port;
@@ -67,8 +85,10 @@ class ClientSocket {
   int sendMessage(void* buf, size_t size);
   long recvMessage(void* buf, size_t size);
   int stop();
+  SocketState getState() const { return state; }
 
  private:
+  SocketState state;
   sockaddr_in clientAddr;
   sockaddr_in connectAddr;
   int sockfd;
