@@ -48,8 +48,8 @@ int main(int argc, char* argv[]) {
     char buf[50];
     ClientSocket Client;
 
-    int inita = Client.init(4567);
-    int con = Client.conn((const std::string&) "138.197.211.144" ,4567);
+    int inita = Client.init(5555);
+    int con = Client.conn((const std::string&) "127.0.0.1" ,4567);
 
     fgets(buf,50,stdin);
     //printf("%s\n",buf);
