@@ -13,6 +13,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <thread>
+#include <string.h>
 
 #define SOCKET_ERROR  (-1)
 
@@ -52,11 +53,6 @@ int ServerSocket::startServer() {
   LOG_INFO("Stating The Server...")
   // Max Connecting
   int flag = listen(this->sockfd, this->maxConn);
-
-  printf("flag:%d\n",flag);
-
-  //printf("this->sockfd=%d--this->maxConn=%d\n",this->sockfd, this->maxConn);
-
   CHECK(flag, SOCKET_ERROR, LOG_ERROR("Server Socket Listen Failed"));
   return 1;
 }
@@ -69,7 +65,6 @@ int ServerSocket::sendMessage(int sockfd, void *buf, size_t size) {
 }
 
 long ServerSocket::recvMessage(int sockfd, void *buf, size_t size) {
-  //
   ssize_t recvSize = recv(sockfd, buf, size, 0);
   CHECK(recvSize, SOCKET_ERROR, LOG_ERROR("Server Socket Recv Error"))
   return recvSize;
@@ -78,10 +73,8 @@ long ServerSocket::recvMessage(int sockfd, void *buf, size_t size) {
 int ServerSocket::acceptConn(sockaddr_in *clientAddr) {
   int sinsize = sizeof(struct sockaddr_in);
   int clientfd = accept(this->sockfd, (sockaddr* )&clientAddr, (socklen_t* )&sinsize);
-  //
-  printf("clientfd:%d\n",clientfd);
   CHECK(clientfd, SOCKET_ERROR, LOG_ERROR("Server Accept Error"))
-  //this->clients.push_back(clientfd);
+  this->clients.push_back(clientfd);
   LOG_INFO("Server Add Client: %d", clientfd)
   return clientfd;
 }
@@ -147,13 +140,6 @@ int ClientSocket::conn(const std::string& serverIPStr, int port) {
   server.sin_port = htons(port);
 
   int flag = connect(this->sockfd,(const struct sockaddr *)&server,(socklen_t)sizeof(server));
-
-  //EINVAL 22
-//The address_len argument is not a valid length for the address family;
-//or invalid address family in the sockaddr structure.
-
-  printf("%d\n",errno);
-
   CHECK(flag, SOCKET_ERROR, LOG_ERROR("Client Connect %s Failed", serverIPStr.c_str()))
   LOG_INFO("Client Connect %s Successed", serverIPStr.c_str())
   this->connectAddr = server;
