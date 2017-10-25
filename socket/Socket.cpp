@@ -80,7 +80,7 @@ int ServerSocket::acceptConn(sockaddr_in *clientAddr) {
   //
   printf("clientfd:%d\n",clientfd);
   CHECK(clientfd, SOCKET_ERROR, LOG_ERROR("Server Accept Error"))
-  this->clients.push_back(clientfd);
+  //this->clients.push_back(clientfd);
   LOG_INFO("Server Add Client: %d", clientfd)
   return clientfd;
 }
@@ -120,7 +120,7 @@ int ClientSocket::init(int port) {
   clientSockAddr.sin_family = AF_INET;
   clientSockAddr.sin_addr.s_addr = clientIP;
 
-  int flag = bind(sockfd, (sockaddr* )&clientSockAddr, sizeof(sockaddr));
+  int flag = bind(sockfd, (sockaddr* )&clientSockAddr, sizeof(clientSockAddr));
   CHECK(flag, SOCKET_ERROR, LOG_ERROR("Client Socket Bind Error"))
 
   this->sockfd = sockfd;
@@ -130,6 +130,30 @@ int ClientSocket::init(int port) {
   LOG_INFO("Client Socket Init Success")
   return 1;
 }
+
+int ClientSocket::conn(const std::string& serverIPStr, int port) {
+  in_addr_t serverIP = inet_addr(serverIPStr.c_str());
+
+  sockaddr_in server;
+
+  server.sin_addr.s_addr = serverIP;
+  server.sin_family = AF_INET;
+  server.sin_port = htons(port);
+
+  int flag = connect(this->sockfd,(const struct sockaddr *)&server,(socklen_t)sizeof(struct sockaddr));
+
+  //EINVAL 22
+//The address_len argument is not a valid length for the address family;
+//or invalid address family in the sockaddr structure.
+
+  printf("%d\n",errno);
+
+  CHECK(flag, SOCKET_ERROR, LOG_ERROR("Client Connect %s Failed", serverIPStr.c_str()))
+  LOG_INFO("Client Connect %s Successed", serverIPStr.c_str())
+  this->connectAddr = server;
+  return 1;
+}
+
 
 
 int ClientSocket::sendMessage(void *buf, size_t size) {
@@ -150,20 +174,5 @@ int ClientSocket::stop() {
   return 1;
 }
 
-int ClientSocket::conn(const std::string& serverIPStr, int port) {
-  //in_addr_t serverIP = inet_addr(serverIPStr.c_str());
-  in_addr_t serverIP = inet_addr(serverIPStr.c_str());
-  sockaddr_in server;
-  server.sin_addr.s_addr = serverIP;
-  server.sin_family = AF_INET;
-  server.sin_port = htons(port);
-
-  int flag = connect(this->sockfd, (sockaddr*)&server, sizeof(sockaddr));
-  printf("flag:%d\n",flag);
-  CHECK(flag, SOCKET_ERROR, LOG_ERROR("Client Connect %s Failed", serverIPStr.c_str()))
-  LOG_INFO("Client Connect %s Successed", serverIPStr.c_str())
-  this->connectAddr = server;
-  return 1;
-}
 
 }
