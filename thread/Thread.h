@@ -9,17 +9,23 @@
 #define RINA_THREAD_H
 
 #include <thread>
+#include <map>
 
 namespace Rina {
 
+class ThreadManager {
 
-class Thread {
+ public:
+  ThreadManager();
+
+  void createThread(int key, void( *handle )( void* ), void* data);
+  std::thread* getThread(int key) { return threads[key]; }
 
 
+ private:
 
-};
-
-class ThreadManager{
+  std::map<int, std::thread* > threads;
+  int threadNum;
 
 
 
