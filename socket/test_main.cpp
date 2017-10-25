@@ -47,8 +47,9 @@ int main(int argc, char* argv[]) {
     char buf[50];
     ClientSocket Client=ClientSocket();
 
-    int inita = Client.init(15555);
+    int inita = Client.init(25555);
     int con = Client.conn((const std::string&)argv[2], 23333);
+    LOG_INFO("Connecting to IP: %s", argv[2])
 
     fgets(buf,50,stdin);
     //printf("%s\n",buf);

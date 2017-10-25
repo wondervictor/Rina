@@ -30,10 +30,11 @@ namespace Rina {
 int ServerSocket::init(int port) {
   LOG_INFO("Server Init")
   sockaddr_in serverSockAddr;
+  memset(&serverSockAddr, 0, sizeof(serverSockAddr));
   int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
   CHECK(sockfd, SOCKET_ERROR, LOG_ERROR("Server Socket Init Failed"))
-  serverSockAddr.sin_addr.s_addr = INADDR_ANY;
+  serverSockAddr.sin_addr.s_addr = inet_addr("0.0.0.0");
   serverSockAddr.sin_port=htons(port);
   serverSockAddr.sin_family = AF_INET;
 //  bzero((serverSockAddr.sin_zero), 8);
@@ -111,17 +112,21 @@ std::vector<int> ServerSocket::getClients() {
 
 int ClientSocket::init(int port) {
 
-  in_addr_t clientIP = inet_addr("127.0.0.1");
+  in_addr_t clientIP = inet_addr("0.0.0.0");
   int sockfd = socket(AF_INET, SOCK_STREAM, 0);
   CHECK(sockfd, -1, LOG_ERROR("Client Socket Init Failed"))
 
   sockaddr_in clientSockAddr;
+  memset(&clientSockAddr, 0, sizeof(clientSockAddr));
+
   clientSockAddr.sin_port = htons(port);
   clientSockAddr.sin_family = AF_INET;
   clientSockAddr.sin_addr.s_addr = clientIP;
 
   int flag = bind(sockfd, (sockaddr* )&clientSockAddr, sizeof(clientSockAddr));
   CHECK(flag, SOCKET_ERROR, LOG_ERROR("Client Socket Bind Error"))
+  printf("%d\n",errno);
+
 
   this->sockfd = sockfd;
   this->port = port;
@@ -135,6 +140,7 @@ int ClientSocket::conn(const std::string& serverIPStr, int port) {
   in_addr_t serverIP = inet_addr(serverIPStr.c_str());
 
   sockaddr_in server;
+  memset(&server, 0, sizeof(server));
 
   server.sin_addr.s_addr = serverIP;
   server.sin_family = AF_INET;
