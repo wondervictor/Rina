@@ -5,16 +5,19 @@
  * */
 
 
-//#include <Socket.h>
+#include "./Socket.h"
 #include <iostream>
 #include <cstring>
 #include "../log/log.h"
+
+
 
 #define CHECK(x, m, handle) if ((x) == (m)) { \
                               handle; \
                               return -1; \
                             }
 
+using namespace Rina;
 
 int main(int argc, char* argv[]) {
 
@@ -26,11 +29,36 @@ int main(int argc, char* argv[]) {
   if (strcmp(argv[1], "server") == 0) {
     LOG_INFO("Run as Server")
 
+    char buf[50];
+    sockaddr_in* clientAddr;
 
-
+    ServerSocket Server=ServerSocket(4567, 20);
+    //ServerSocket(int port, int maxConn):port(port), maxConn(maxConn) {};
+    int sockfd = Server.init(4567);
+    int start = Server.startServer();
+    int accept = Server.acceptConn(clientAddr);
+    long recvSize=Server.recvMessage(accept,(void*) buf,50);
+    printf("%s\n",buf);
+    Server.sendMessage(accept,(void*) buf,50);
+    Server.stopServer();
 
   } else if (strcmp(argv[1], "client") == 0) {
     LOG_INFO("Run as Client")
+
+    char buf[50];
+    ClientSocket Client;
+
+    int inita = Client.init(4567);
+    int con = Client.conn((const std::string&) "138.197.211.144" ,4567);
+
+    fgets(buf,50,stdin);
+    //printf("%s\n",buf);
+    int send = Client.sendMessage((void*) buf, 50);
+
+    long recv = Client.recvMessage((void*) buf,50);
+    printf("%s\n",buf);
+    int st = Client.stop();
+
   } else {
     LOG_WARN("No run")
   }
