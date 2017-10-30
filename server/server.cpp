@@ -37,9 +37,9 @@ static void handle(void* handle) {
       return;
     }
     printf("%sRecv from [%d] Message: [%s]%s\n", CYAN, sockfd, buf, NONE);
-    //clientHandle->serverSocket->broadcast(buf,strlen(buf));
-    printf("%sSend from [%d] Message: [%s]%s\n", CYAN, sockfd, buf, NONE);
-    clientHandle->serverSocket->sendMessage(sockfd, buf, strlen(buf));
+    clientHandle->serverSocket->broadcast(buf,strlen(buf));
+    //printf("%sSend from [%d] Message: [%s]%s\n", CYAN, sockfd, buf, NONE);
+    //clientHandle->serverSocket->sendMessage(sockfd, buf, strlen(buf));
   }
 }
 
