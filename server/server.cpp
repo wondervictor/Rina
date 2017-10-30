@@ -11,6 +11,23 @@
 
 namespace Rina {
 
+struct __handle {
+  int fd;
+  ServerSocket* serverSocket;
+};
+
+static void handle(void* handle) {
+
+  __handle* clientHandle = (__handle* )handle;
+  char buf[100];
+  int sockfd = clientHandle->fd;
+  while(true) {
+    long len = clientHandle->serverSocket->recvMessage(sockfd, buf, 100);
+    printf("%sRecv from [%d] Message: [%s]%s\n", CYAN, sockfd, buf, NONE);
+    clientHandle->serverSocket->sendMessage(sockfd, buf, strlen(buf));
+  }
+}
+
 int RinaServer::init(int port) {
   LOG_INFO("Init Server")
   this->serverSocket = new ServerSocket();
@@ -39,25 +56,14 @@ int RinaServer::start() {
       continue;
     }
     this->users[clientfd] = clientAddr;
-    int fd = clientfd;
-    this->threadManager.createThread(clientfd, this->handle, (void* )(&fd));
+    __handle* clientHandle = new __handle;
+    clientHandle->fd = clientfd;
+    clientHandle->serverSocket = this->serverSocket;
+    this->threadManager.createThread(clientfd, handle, (void* )(clientHandle));
 
-    LOG_INFO("%d join thr room", fd);
+    LOG_INFO("%d join thr room", clientfd);
   }
   return 0;
 }
-
-void RinaServer::handle(void* data) {
-
-  int sockfd = *((int *)data);
-  char buf[100];
-  while(true) {
-    long len = this->serverSocket->recvMessage(sockfd, buf, 100);
-    printf("%sRecv from [%d] Message: [%s]%s\n", CYAN, sockfd, buf, NONE);
-    this->serverSocket->sendMessage(sockfd, buf, strlen(buf));
-  }
-
-}
-
 
 }

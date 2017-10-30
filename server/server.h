@@ -30,7 +30,6 @@ class ClientUser {
   std::string name;
   int state = 0;
 
-
 };
 
 /**
@@ -51,7 +50,6 @@ class RinaServer {
 
  private:
   ThreadManager threadManager;
-  void handle(void* data);
   std::map<int, sockaddr_in> users;
   ServerSocket* serverSocket;
   std::vector<message *> messages;

@@ -27,8 +27,6 @@ class RinaClient {
   ClientSocket* clientSocket;
   ThreadManager* manager;
 
-  void handleRecvMesage(void* );
-  void handleSendMessage(void* );
 
 };
 

@@ -9,6 +9,7 @@ set(SRC client.cpp test_main.cpp)
 
 add_executable(client ${SRC})
 
-set(LIB ../socket/librsocket ../thread/librthread)
+set(DIR_PATH /Users/Vic/Dev/System/Rina)
+set(LIB ${DIR_PATH}/socket/librsocket.a ${DIR_PATH}/thread/librthread.a)
 
 target_link_libraries(client ${LIB})
