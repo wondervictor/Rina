@@ -6,6 +6,7 @@
 
 #include "server.h"
 #include "../log/log.h"
+#include <string.h>
 
 
 namespace Rina {
@@ -49,8 +50,11 @@ int RinaServer::start() {
 void RinaServer::handle(void* data) {
 
   int sockfd = *((int *)data);
+  char buf[100];
   while(true) {
-    
+    long len = this->serverSocket->recvMessage(sockfd, buf, 100);
+    printf("%sRecv from [%d] Message: [%s]%s\n", CYAN, sockfd, buf, NONE);
+    this->serverSocket->sendMessage(sockfd, buf, strlen(buf));
   }
 
 }
