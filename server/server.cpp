@@ -21,9 +21,24 @@ static void handle(void* handle) {
   __handle* clientHandle = (__handle* )handle;
   char buf[100];
   int sockfd = clientHandle->fd;
+  LOG_INFO("Waiting for message")
   while(true) {
     long len = clientHandle->serverSocket->recvMessage(sockfd, buf, 100);
+    if (len <= 0)
+      continue;
+    if (strcmp(buf, "logout") == 0) {
+      clientHandle->serverSocket->closeConn(sockfd);
+      printf("Current Online Users: ");
+      for(auto p: clientHandle->serverSocket->getClients()) {
+        printf("%d, ", p);
+      }
+      printf("\n");
+      LOG_INFO("[%d] logout", sockfd)
+      return;
+    }
     printf("%sRecv from [%d] Message: [%s]%s\n", CYAN, sockfd, buf, NONE);
+    //clientHandle->serverSocket->broadcast(buf,strlen(buf));
+    printf("%sSend from [%d] Message: [%s]%s\n", CYAN, sockfd, buf, NONE);
     clientHandle->serverSocket->sendMessage(sockfd, buf, strlen(buf));
   }
 }
@@ -61,7 +76,7 @@ int RinaServer::start() {
     clientHandle->serverSocket = this->serverSocket;
     this->threadManager.createThread(clientfd, handle, (void* )(clientHandle));
 
-    LOG_INFO("%d join thr room", clientfd);
+    LOG_INFO("%d join the room", clientfd);
   }
   return 0;
 }

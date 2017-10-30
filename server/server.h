@@ -14,23 +14,10 @@
 
 #include "../socket/Socket.h"
 #include "../thread/Thread.h"
+#include "../Model.h"
 
 
 namespace Rina {
-
-class message {
-  std::string user;
-  std::string content;
-  long timestamp;
-};
-
-
-class ClientUser {
-  int sockfd;
-  std::string name;
-  int state = 0;
-
-};
 
 /**
  * @brief Rina Server

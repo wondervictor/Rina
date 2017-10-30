@@ -11,6 +11,7 @@
 #include <netdb.h>
 #include <sys/socket.h>
 #include <vector>
+#include <set>
 
 #define CHECK(x, m, handle) if ((x) == (m)) { \
                               handle; \
@@ -57,8 +58,10 @@ class ServerSocket {
   long recvMessage(int sockfd, void* buf, size_t size);
   int acceptConn(sockaddr_in* clientAddr);
   int broadcast(void* buf, size_t size);
-  std::vector<int> getClients();
+  std::set<int> getClients();
   SocketState getState() const { return state; }
+  int closeConn(int sockfd);
+
 
 
  private:
@@ -66,7 +69,7 @@ class ServerSocket {
   sockaddr_in serverAddr;
   int sockfd;
   int port;
-  std::vector<int> clients;
+  std::set<int> clients;
   int maxConn;
 
 };

@@ -5,7 +5,8 @@ project(server)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(SRC server.cpp test_main.cpp)
+include_directories(../)
+set(SRC server.cpp test_main.cpp ../Model.cpp)
 
 add_executable(server ${SRC})
 set(DIR_PATH /Users/Vic/Dev/System/Rina)

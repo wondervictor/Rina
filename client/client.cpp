@@ -15,7 +15,7 @@ static void handleSendMessage(void* clientSocket) {
   char buf[100];
   ClientSocket* pclientSocket = (ClientSocket* )clientSocket;
   while(true) {
-    printf(">>>: ");
+    //printf(">>>: ");
     scanf("%s", buf);
     size_t len = strlen(buf);
     int flag = pclientSocket->sendMessage(buf, len);
@@ -33,6 +33,8 @@ static void handleRecvMesage(void* clientSocket) {
   ClientSocket* pclientSocket = (ClientSocket* )clientSocket;
   while(true) {
     ssize_t len =pclientSocket->recvMessage(buf, 100);
+    if (len == 0)
+      continue;
     if (len == SOCKET_ERROR) {
       LOG_WARN("Receive Server Failed: %s",buf)
       continue;
@@ -56,10 +58,48 @@ int RinaClient::login(std::string &server, int port) {
   int flag = this->clientSocket->conn(server, port);
   CHECK(flag, SOCKET_ERROR, LOG_WARN("Fail Connect Server"))
   LOG_INFO("Login Success")
-  manager->createThread(0, handleSendMessage, (void* )&this->clientSocket);
-  manager->createThread(1, handleRecvMesage, (void* )&this->clientSocket);
+  char buf[100];
+  //ClientSocket* pclientSocket = (ClientSocket* )clientSocket;
+  while(true) {
+    printf(">>>: ");
+    scanf("%s", buf);
+    if (strcmp(buf, "logout") == 0) {
+      LOG_INFO("Preparing to log out")
+      logout();
+      break;
+    }
+    size_t len = strlen(buf);
+    int flag = this->clientSocket->sendMessage(buf, len);
+    if (flag == SOCKET_ERROR) {
+      LOG_WARN("Send Server Failed: %s",buf)
+      continue;
+    } else {
+      printf("Send to Server: %s\n", buf);
+    }
+
+    len = this->clientSocket->recvMessage(buf, 100);
+    if (len == 0)
+      continue;
+    if (len == SOCKET_ERROR) {
+      LOG_WARN("Receive Server Failed: %s",buf)
+      continue;
+    } else {
+      printf("Received from server: %s\n", buf);
+    }
+  }
+  //manager->createThread(0, handleSendMessage, (void* )&this->clientSocket);
+  //manager->createThread(1, handleRecvMesage, (void* )&this->clientSocket);
+  //while(true)
+  //  DEBUG("Run")
   return 0;
 }
 
+int RinaClient::logout() {
+  LOG_INFO("Client Stops")
+  char message[] = "logout";
+  this->clientSocket->sendMessage(message, strlen(message));
+  this->clientSocket->stop();
+  return 0;
+}
 
 }

@@ -5,7 +5,8 @@ project(client)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(SRC client.cpp test_main.cpp)
+include_directories(../)
+set(SRC client.cpp test_main.cpp ../Model.cpp)
 
 add_executable(client ${SRC})
 

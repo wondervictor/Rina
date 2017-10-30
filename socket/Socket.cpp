@@ -58,6 +58,7 @@ int ServerSocket::startServer() {
 // send message
 int ServerSocket::sendMessage(int sockfd, void *buf, size_t size) {
   ssize_t sendSize = send(sockfd, buf, size, 0);
+  DEBUG("Server Send")
   CHECK(sendSize, SOCKET_ERROR, {LOG_ERROR("Server Socket Send Error") state=Error;})
   return 1;
 }
@@ -65,6 +66,7 @@ int ServerSocket::sendMessage(int sockfd, void *buf, size_t size) {
 long ServerSocket::recvMessage(int sockfd, void *buf, size_t size) {
   //
   ssize_t recvSize = recv(sockfd, buf, size, 0);
+  DEBUG("Server Recv")
   CHECK(recvSize, SOCKET_ERROR, {LOG_ERROR("Server Socket Recv Error") state=Error;})
   return recvSize;
 }
@@ -73,6 +75,7 @@ int ServerSocket::acceptConn(sockaddr_in *clientAddr) {
   int sinsize = sizeof(struct sockaddr_in);
   int clientfd = accept(this->sockfd, (sockaddr* )&clientAddr, (socklen_t* )&sinsize);
   CHECK(clientfd, SOCKET_ERROR, {LOG_ERROR("Server Accept Error") state=Error;})
+  this->clients.insert(clientfd);
   LOG_INFO("Server Add Client: %d", clientfd)
   return clientfd;
 }
@@ -97,8 +100,14 @@ int ServerSocket::stopServer() {
   return 1;
 }
 
-std::vector<int> ServerSocket::getClients() {
+std::set<int> ServerSocket::getClients() {
   return this->clients;
+}
+
+int ServerSocket::closeConn(int sockfd) {
+  close(sockfd);
+  this->clients.erase(sockfd);
+  return 0;
 }
 
 
@@ -137,7 +146,6 @@ int ClientSocket::conn(const std::string& serverIPStr, int port) {
   server.sin_port = htons(port);
 
   int flag = connect(this->sockfd,(const struct sockaddr *)&server,(socklen_t)sizeof(server));
-
   CHECK(flag, SOCKET_ERROR, {LOG_ERROR("Client Connect %s Failed", serverIPStr.c_str()) state=Error;})
   LOG_INFO("Client Connect %s Successed", serverIPStr.c_str())
   this->connectAddr = server;
@@ -148,12 +156,14 @@ int ClientSocket::conn(const std::string& serverIPStr, int port) {
 
 int ClientSocket::sendMessage(void *buf, size_t size) {
   ssize_t sendSize = send(sockfd, buf, size, 0);
+  DEBUG("Client Send")
   CHECK(sendSize, SOCKET_ERROR, {LOG_ERROR("Client Socket Send Error") state=Error;})
   return 1;
 }
 
 long ClientSocket::recvMessage(void *buf, size_t size) {
   ssize_t recvSize = recv(sockfd, buf, size, 0);
+  DEBUG("Client Recv")
   CHECK(recvSize, SOCKET_ERROR, {LOG_ERROR("Client Socket Recv Error") state=Error;})
   return recvSize;
 }

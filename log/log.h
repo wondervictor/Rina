@@ -9,6 +9,7 @@
 #ifndef RINA_LOG_H
 #define RINA_LOG_H
 #include <stdio.h>
+#include <errno.h>
 
 #define NONE      "\e[0m"
 #define BLACK     "\e[0;30m"
@@ -49,5 +50,7 @@
                           printf(__VA_ARGS__);   \
                           printf(NEW_LINE); \
                         }
+
+#define DEBUG(x)        { if (errno > 0) printf("%s[ERROR]%s %s error: %s (errno: %d)\n", RED, NONE, x, strerror(errno), errno);}
 
 #endif //RINA_LOG_H
