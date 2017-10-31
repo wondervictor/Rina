@@ -12,9 +12,9 @@
 #include <map>
 #include <vector>
 
-#include "../socket/Socket.h"
-#include "../thread/Thread.h"
-#include "../Model.h"
+#include "Socket.h"
+#include "Thread.h"
+#include "Model.h"
 
 
 namespace Rina {
@@ -27,20 +27,19 @@ class RinaServer {
  public:
   RinaServer()= default;
 
-
   int init(int port);
   int start();
   int stop();
-  int login();
+  int login(User user, std::string userIP);
   int logout();
 
 
  private:
   ThreadManager threadManager;
-  std::map<int, sockaddr_in> users;
+  std::map<int, User> users;
+  std::map<int, sockaddr_in> userAddrs;
   ServerSocket* serverSocket;
-  std::vector<message *> messages;
-
+  std::vector<Message *> messages;
 
 };
 

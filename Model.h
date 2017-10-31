@@ -34,6 +34,8 @@ enum MessageType {
 
 class Message {
  public:
+  Message() = default;
+
   Message(std::string& _name, std::string& _content, std::string& ip, long time):
       username(_name),
       content(_content),
@@ -59,8 +61,8 @@ class MultiMessage {
 };
 
 
+struct User {
 
-class ClientUser {
   int sockfd;
   std::string name;
   UserState state = offline;

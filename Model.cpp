@@ -21,5 +21,4 @@ MessageType Message::getType() {
   }
 }
 
-
 }

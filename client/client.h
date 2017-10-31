@@ -9,8 +9,8 @@
 #ifndef RINA_CLIENT_H
 #define RINA_CLIENT_H
 #include <string>
-#include "../socket/Socket.h"
-#include "../thread/Thread.h"
+#include "Socket.h"
+#include "Thread.h"
 
 
 namespace Rina {
@@ -24,9 +24,11 @@ class RinaClient {
   int logout();
 
  private:
+  // 连接 Center 服务器
   ClientSocket* clientSocket;
+  // Peer to Peer 连接
+  ServerSocket* peerSocket;
   ThreadManager* manager;
-
 
 };
 

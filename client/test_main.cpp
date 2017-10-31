@@ -9,6 +9,7 @@
 #include <string.h>
 
 int main(int argc, char* argv[]) {
+  std::string p = "dwq";
 
   using namespace Rina;
   if (argc < 2) {

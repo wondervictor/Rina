@@ -15,7 +15,7 @@ static void handleSendMessage(void* clientSocket) {
   char buf[100];
   ClientSocket* pclientSocket = (ClientSocket* )clientSocket;
   while(true) {
-    //printf(">>>: ");
+    printf(">>>: ");
     scanf("%s", buf);
     size_t len = strlen(buf);
     int flag = pclientSocket->sendMessage(buf, len);

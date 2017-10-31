@@ -71,23 +71,23 @@ long ServerSocket::recvMessage(int sockfd, void *buf, size_t size) {
   return recvSize;
 }
 
-int ServerSocket::acceptConn(sockaddr_in *clientAddr) {
+int ServerSocket::acceptConn(sockaddr_in* clientAddr) {
   int sinsize = sizeof(struct sockaddr_in);
   int clientfd = accept(this->sockfd, (sockaddr* )&clientAddr, (socklen_t* )&sinsize);
   CHECK(clientfd, SOCKET_ERROR, {LOG_ERROR("Server Accept Error") state=Error;})
-  this->clients.insert(clientfd);
+  this->clients[clientfd] = *clientAddr;
   LOG_INFO("Server Add Client: %d", clientfd)
   return clientfd;
 }
 
 int ServerSocket::broadcast(void *buf, size_t size) {
   int sum = 0;
-  for(auto clientfd: this->clients) {
-    int flag = sendMessage(clientfd, buf, size);
+  for(auto client: this->clients) {
+    int flag = sendMessage(client.first, buf, size);
     if (flag == 1) {
       sum ++;
     } else {
-      LOG_WARN("Server Send: %d Failed", clientfd);
+      LOG_WARN("Server Send: %d Failed", client.first);
     }
   }
   return sum;
@@ -100,7 +100,7 @@ int ServerSocket::stopServer() {
   return 1;
 }
 
-std::set<int> ServerSocket::getClients() {
+std::map<int, sockaddr_in> ServerSocket::getClients() {
   return this->clients;
 }
 
