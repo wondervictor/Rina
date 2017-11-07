@@ -96,7 +96,9 @@ int RinaClient::login(std::string &server, int port) {
 
 int RinaClient::logout() {
   LOG_INFO("Client Stops")
-  char message[] = "logout";
+  std::string username = this->user->name;
+
+  Message message(username, LOGIN, "", );
   this->clientSocket->sendMessage(message, strlen(message));
   this->clientSocket->stop();
   return 0;

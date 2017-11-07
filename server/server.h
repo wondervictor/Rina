@@ -30,9 +30,14 @@ class RinaServer {
   int init(int port);
   int start();
   int stop();
-  int login(User user, std::string userIP);
-  int logout();
-
+  int login(User& user, std::string& userIP);
+  int logout(User& user);
+  User getUser(int sockfd);
+  std::map<int, User> getUserMaps();
+  int updateUser(int sockfd, User& user);
+  int getMessages(int seq, std::vector<Message>&);
+  int addMessage(Message&);
+  ~RinaServer();
 
  private:
   ThreadManager threadManager;

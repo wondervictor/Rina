@@ -11,8 +11,10 @@
 
 #define BUF_SIZE 1024
 
-
 namespace Rina {
+
+std::string ServerName = "SERVER";
+std::string DefaultIP = "0.0.0.0";
 
 struct __handle {
   int fd;
@@ -22,11 +24,10 @@ struct __handle {
 
 static void handle(void* handle) {
 
-  __handle* clientHandle = (__handle* )handle;
+  auto* clientHandle = (__handle* )handle;
   Message msgBuf;
   int sockfd = clientHandle->fd;
   LOG_INFO("Waiting for message")
-
   while(true) {
     long len = clientHandle->serverSocket->recvMessage(sockfd, &msgBuf, BUF_SIZE);
     if (len <= 0)
@@ -43,6 +44,36 @@ static void handle(void* handle) {
       newUser.state = online;
       newUser.updateSeq = 0;
       clientHandle->server->login(newUser, userIP);
+      long timestamp = getTime();
+      std::string responseMsg = LOGIN_SUCCESS;
+      Message response(ServerName, responseMsg, DefaultIP, timestamp);
+      clientHandle->serverSocket->sendMessage(sockfd, &response, sizeof(response));
+    } else if (msgBuf.getType() == logout) {
+      std::string username = msgBuf.getUsername();
+      User tmpUser;
+      tmpUser.sockfd = sockfd;
+      tmpUser.name = username;
+      clientHandle->server->logout(tmpUser);
+
+      long timestamp = getTime();
+      std::string responseMsg = LOGOUT;
+      Message response(ServerName, responseMsg, DefaultIP, timestamp);
+      clientHandle->serverSocket->sendMessage(sockfd, &response, sizeof(response));
+
+    } else if (msgBuf.getType() == getall) {
+
+      User user = clientHandle->server->getUser(sockfd);
+      long updateSeq = user.updateSeq;
+      std::vector<Message> messages;
+      clientHandle->server->getMessages(updateSeq, messages);
+      long messagesCount = messages.size();
+      updateSeq += messagesCount;
+      user.updateSeq = updateSeq;
+      clientHandle->server->updateUser(sockfd, user);
+      MultiMessage message(messages);
+      clientHandle->serverSocket->sendMessage(sockfd, &message, sizeof(message));
+    } else {
+      clientHandle->server->addMessage(msgBuf);
     }
   }
 
@@ -107,10 +138,54 @@ int RinaServer::start() {
   return 0;
 }
 
+int RinaServer::logout(User& user) {
+  LOG_INFO("User: %s Log Out", user.name)
+  this->serverSocket->closeConn(user.sockfd);
+  this->userAddrs.erase(user.sockfd);
+  this->users.erase(user.sockfd);
+  return 0;
+}
 
-int RinaServer::login(User user, std::string userIP) {
+int RinaServer::getMessages(int seq, std::vector<Message>& msgs) {
+  std::vector<Message* >::iterator msgIter = this->messages.begin();
+  msgIter += seq;
+  for(; msgIter != this->messages.end(); msgIter ++) {
+    msgs.push_back(**msgIter);
+  }
+  return 0;
+}
+
+User RinaServer::getUser(int sockfd) {
+  return this->users[sockfd];
+}
+
+std::map<int, User> RinaServer::getUserMaps() {
+  return users;
+}
+
+int RinaServer::updateUser(int sockfd, User& user) {
+  this->users[sockfd] = user;
+  return 0;
+}
+
+int RinaServer::login(User& user, std::string& userIP) {
   this->users[user.sockfd] = user;
   LOG_INFO("User: %s from IP: %s joins the room now", user.name, userIP);
+  return 0;
+}
+
+int RinaServer::addMessage(Message &msg) {
+#warning add thread lock here
+  Message* newMsg = new Message(msg);
+  this->messages.push_back(newMsg);
+  return 0;
+}
+
+RinaServer::~RinaServer() {
+  delete serverSocket;
+  for(Message* p: this->messages) {
+    delete p;
+  }
 }
 
 }

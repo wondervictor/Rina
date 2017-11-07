@@ -5,6 +5,8 @@
  * */
 
 #include "Model.h"
+#include <time.h>
+#include <stdlib.h>
 
 namespace Rina {
 
@@ -19,6 +21,26 @@ MessageType Message::getType() {
   } else {
     return normal;
   }
+}
+
+Message& Message::operator=(Message &msg) {
+  this->username = msg.username;
+  this->content = msg.content;
+  this->timestamp = msg.timestamp;
+  this->ipAddress = msg.ipAddress;
+  return *this;
+}
+
+Message::Message(Message &msg) {
+  this->username = msg.username;
+  this->content = msg.content;
+  this->timestamp = msg.timestamp;
+  this->ipAddress = msg.ipAddress;
+}
+
+inline long getTime() {
+  long timestamp = time(nullptr);
+  return timestamp;
 }
 
 }

@@ -16,6 +16,11 @@
 #define LOGOUT        "e21874vnwv1o2870810"
 // 请求聊天记录
 #define GET_ALL       "1321c32-23@(*^&*#Bv"
+// 登录成功
+#define LOGIN_SUCCESS "&*TBX*GR*&@BC&GF&*@"
+// 发送成功
+#define SEND_SUCESS   "&*^*@BUOWBDI(*@#&(^"
+
 
 namespace Rina {
 
@@ -29,7 +34,8 @@ enum MessageType {
   normal = 0,
   login,
   logout,
-  getall
+  getall,
+  success
 };
 
 class Message {
@@ -41,6 +47,8 @@ class Message {
       content(_content),
       ipAddress(ip),
       timestamp(time){};
+  Message& operator=(Message& );
+  Message(Message& );
   std::string getUsername() const { return username; }
   std::string getContent() const { return content; }
   std::string getAddress() const { return ipAddress; }
@@ -57,6 +65,9 @@ class Message {
 class MultiMessage {
  public:
   std::vector<Message> messages;
+  MultiMessage(std::vector<Message>& msgs) {
+    messages = msgs;
+  }
 
 };
 
@@ -68,6 +79,8 @@ struct User {
   UserState state = offline;
   long updateSeq = 0;
 };
+
+inline long getTime();
 
 
 }
