@@ -20,7 +20,8 @@
 #define LOGIN_SUCCESS "&*TBX*GR*&@BC&GF&*@"
 // 发送成功
 #define SEND_SUCESS   "&*^*@BUOWBDI(*@#&(^"
-
+// 下线成功
+#define OUT_SUCCESS   "^&*^&#%*&(G&FC&^WRG"
 
 namespace Rina {
 
@@ -64,10 +65,9 @@ class Message {
 
 class MultiMessage {
  public:
+  MultiMessage()= default;
   std::vector<Message> messages;
-  MultiMessage(std::vector<Message>& msgs) {
-    messages = msgs;
-  }
+  MultiMessage(std::vector<Message>& msgs):messages(msgs){};
 
 };
 

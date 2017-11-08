@@ -21,9 +21,10 @@ class RinaClient {
  public:
   RinaClient() = default;
   int init(int port);
-  void createUser(std::string name, )
+  void createUser(std::string& name);
   int login(std::string&, int);
   int logout();
+  int handleMessages(MultiMessage* messages);
 
  private:
   User* user;
