@@ -11,7 +11,7 @@ int main(int argc, char* argv[]) {
   using namespace Rina;
 
   RinaServer server;
-  server.init(23333);
+  server.init(atoi(argv[1]));
   server.start();
 
 

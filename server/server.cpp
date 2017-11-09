@@ -55,10 +55,10 @@ static void handle(void* handle) {
       tmpUser.name = username;
       clientHandle->server->logout(tmpUser);
 
-      long timestamp = getTime();
-      std::string responseMsg = LOGOUT;
-      Message response(ServerName, responseMsg, DefaultIP, timestamp);
-      clientHandle->serverSocket->sendMessage(sockfd, &response, sizeof(response));
+      //long timestamp = getTime();
+      //std::string responseMsg = LOGOUT;
+      //Message response(ServerName, responseMsg, DefaultIP, timestamp);
+      //clientHandle->serverSocket->sendMessage(sockfd, &response, sizeof(response));
 
     } else if (msgBuf.getType() == getall) {
 
@@ -139,7 +139,7 @@ int RinaServer::start() {
 }
 
 int RinaServer::logout(User& user) {
-  LOG_INFO("User: %s Log Out", user.name)
+  LOG_INFO("User: %s Log Out", user.name.c_str())
   this->serverSocket->closeConn(user.sockfd);
   this->userAddrs.erase(user.sockfd);
   this->users.erase(user.sockfd);
@@ -147,7 +147,7 @@ int RinaServer::logout(User& user) {
 }
 
 int RinaServer::getMessages(int seq, std::vector<Message>& msgs) {
-  std::vector<Message* >::iterator msgIter = this->messages.begin();
+  auto msgIter = this->messages.begin();
   msgIter += seq;
   for(; msgIter != this->messages.end(); msgIter ++) {
     msgs.push_back(**msgIter);
@@ -170,13 +170,13 @@ int RinaServer::updateUser(int sockfd, User& user) {
 
 int RinaServer::login(User& user, std::string& userIP) {
   this->users[user.sockfd] = user;
-  LOG_INFO("User: %s from IP: %s joins the room now", user.name, userIP);
+  LOG_INFO("User: %s from IP: %s joins the room now", user.name.c_str(), userIP.c_str());
   return 0;
 }
 
 int RinaServer::addMessage(Message &msg) {
 #warning add thread lock here
-  Message* newMsg = new Message(msg);
+  auto* newMsg = new Message(msg);
   this->messages.push_back(newMsg);
   return 0;
 }

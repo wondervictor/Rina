@@ -18,7 +18,9 @@ int main(int argc, char* argv[]) {
 
   RinaClient client;
   client.init(atoi(argv[1]));
+  std::string username = argv[2];
+  client.createUser(username);
   std::string serverIP = "0.0.0.0";
-  client.login(serverIP, 23333);
+  client.login(serverIP, atoi(argv[3]));
 
 }

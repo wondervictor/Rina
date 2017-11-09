@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 
+
 // 登录
 #define LOGIN         "*2c411521vn148-e=1r"
 // 登出
@@ -24,6 +25,17 @@
 #define OUT_SUCCESS   "^&*^&#%*&(G&FC&^WRG"
 
 namespace Rina {
+
+/**
+ *
+ *  Message: [{user$}]
+ *
+ *
+ *
+ *
+ *
+ * */
+
 
 
 enum UserState {
@@ -41,20 +53,22 @@ enum MessageType {
 
 class Message {
  public:
-  Message() = default;
+  Message() =default;
 
   Message(std::string& _name, std::string& _content, std::string& ip, long time):
       username(_name),
       content(_content),
       ipAddress(ip),
       timestamp(time){};
-  Message& operator=(Message& );
-  Message(Message& );
+
+  Message& operator=(const Message& );
+  Message(const Message& );
   std::string getUsername() const { return username; }
   std::string getContent() const { return content; }
   std::string getAddress() const { return ipAddress; }
-  inline MessageType getType();
+  MessageType getType();
   long getTime() const { return timestamp; }
+  void toString(std::string& p);
 
  private:
   std::string username;
@@ -68,8 +82,11 @@ class MultiMessage {
   MultiMessage()= default;
   std::vector<Message> messages;
   MultiMessage(std::vector<Message>& msgs):messages(msgs){};
-
+  void toString(std::string& p);
 };
+
+
+int parseMessage(const std::string& messageStr, std::vector<Message>& message);
 
 
 struct User {
@@ -80,7 +97,10 @@ struct User {
   long updateSeq = 0;
 };
 
-inline long getTime();
+inline long getTime() {
+  long timestamp = time(nullptr);
+  return timestamp;
+}
 
 
 }

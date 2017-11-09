@@ -8,11 +8,12 @@ set(CMAKE_CXX_STANDARD 11)
 include_directories(../)
 include_directories(../thread/)
 include_directories(../socket/)
+include_directories(../cJSON/)
 
 set(SRC server.cpp test_main.cpp ../Model.cpp)
 
 add_executable(server ${SRC})
 set(DIR_PATH /Users/Vic/Dev/System/Rina)
-set(LIB ${DIR_PATH}/socket/librsocket.a ${DIR_PATH}/thread/librthread.a)
+set(LIB ${DIR_PATH}/socket/librsocket.a ${DIR_PATH}/thread/librthread.a ${DIR}/cJSON/lib/libcjson.dylib)
 
 target_link_libraries(server ${LIB})

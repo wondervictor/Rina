@@ -100,15 +100,15 @@ int RinaClient::login(std::string &server, int port) {
       } else {
         printf("Send to Server: %s\n", GET_ALL);
       }
-      auto* messages = new MultiMessage();
-      ssize_t recvLen = this->clientSocket->recvMessage(messages, 1024);
+      auto messages = MultiMessage();
+      ssize_t recvLen = this->clientSocket->recvMessage(&messages, 1024);
       if (recvLen == 0)
         continue;
       if (recvLen == SOCKET_ERROR) {
         LOG_WARN("Receive Server Failed: %s",buf)
         continue;
       } else {
-        this->handleMessages(messages);
+        this->handleMessages(&messages);
       }
       continue;
     } else {
@@ -116,6 +116,7 @@ int RinaClient::login(std::string &server, int port) {
       long time = getTime();
       Message message = Message(user->name, content, DefaultIP, time);
       this->clientSocket->sendMessage(&message, sizeof(message));
+      continue;
     }
 
     if (flag == SOCKET_ERROR) {
@@ -143,31 +144,32 @@ int RinaClient::login(std::string &server, int port) {
 }
 
 int RinaClient::handleMessages(MultiMessage *messages) {
-
   auto iter = messages->messages.begin();
   for (; iter != messages->messages.end(); iter ++) {
-    printf("[%ld] %s(%s): %s\n", iter->getTime(), iter->getUsername(), iter->getAddress(),iter->getContent());
+    printf("[%ld] %s(%s): %s\n", iter->getTime(), iter->getUsername().c_str(), iter->getAddress().c_str(),iter->getContent().c_str());
   }
   delete messages;
   return 0;
 }
 
 void RinaClient::createUser(std::string& name) {
-  user->updateSeq = 0;
-  user->name = name;
-  user->sockfd = 0;
-  user->state = offline;
+  LOG_INFO("Hello")
+  this->user = new User;
+  this->user->updateSeq = 0;
+  this->user->name = name;
+  this->user->sockfd = 0;
+  this->user->state = offline;
 }
 
 //
-//int RinaClient::logout() {
-//  LOG_INFO("Client Stops")
+int RinaClient::logout() {
+  LOG_INFO("Client Stops")
 //  std::string username = this->user->name;
 //
 //  Message message(username, LOGIN, "", );
 //  this->clientSocket->sendMessage(message, strlen(message));
-//  this->clientSocket->stop();
-//  return 0;
-//}
+  this->clientSocket->stop();
+  return 0;
+}
 
 }

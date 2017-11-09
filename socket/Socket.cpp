@@ -22,6 +22,7 @@ namespace Rina {
 
 // server socket init
 int ServerSocket::init(int port) {
+  this->clients = std::map<int, sockaddr_in>();
   LOG_INFO("Server Init")
   sockaddr_in serverSockAddr;
   memset(&serverSockAddr, 0, sizeof(serverSockAddr));
@@ -75,7 +76,9 @@ int ServerSocket::acceptConn(sockaddr_in* clientAddr) {
   int sinsize = sizeof(struct sockaddr_in);
   int clientfd = accept(this->sockfd, (sockaddr* )&clientAddr, (socklen_t* )&sinsize);
   CHECK(clientfd, SOCKET_ERROR, {LOG_ERROR("Server Accept Error") state=Error;})
-  this->clients[clientfd] = *clientAddr;
+
+#warning add clients
+  //this->clients[clientfd] = *clientAddr;
   LOG_INFO("Server Add Client: %d", clientfd)
   return clientfd;
 }
