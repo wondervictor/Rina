@@ -33,6 +33,7 @@ class RinaClient {
   // Peer to Peer 连接
   ServerSocket* peerSocket;
   ThreadManager* manager;
+  int updatePeriod;
 
 };
 

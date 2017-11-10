@@ -18,7 +18,7 @@ class ThreadManager {
  public:
   ThreadManager();
 
-  void createThread(int key, void( *handle )( void* ), void* data);
+  void createThread(int key, void(*handle)(void*), void* data);
   std::thread* getThread(int key) { return threads[key]; }
 
 
@@ -27,9 +27,7 @@ class ThreadManager {
   std::map<int, std::thread* > threads;
   int threadNum;
 
-
 };
-
 }
 
 #endif //RINA_THREAD_H

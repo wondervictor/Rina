@@ -11,7 +11,6 @@
 
 #include <map>
 #include <vector>
-
 #include "Socket.h"
 #include "Thread.h"
 #include "Model.h"

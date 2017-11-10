@@ -73,6 +73,7 @@ static void handle(void* handle) {
       //clientHandle->serverSocket->sendMessage(sockfd, &response, sizeof(response));
 
     } else if (recvMsg.getType() == getall) {
+      LOG_INFO("GET ALL")
 
       User user = clientHandle->server->getUser(sockfd);
       long updateSeq = user.updateSeq;
@@ -84,9 +85,13 @@ static void handle(void* handle) {
       clientHandle->server->updateUser(sockfd, user);
       MultiMessage message(messages);
       const char* msg = message.toString().c_str();
+
       size_t strLen = strlen(msg);
       char sendMsg[strLen];
       strcpy(sendMsg, msg);
+      LOG_INFO("count:%d\n", messagesCount)
+      LOG_INFO("strlen: %lu\n", strLen);
+      LOG_INFO("ALL:\n%s", msg)
       clientHandle->serverSocket->sendMessage(sockfd, sendMsg, strlen(sendMsg));
 
     } else {
@@ -94,26 +99,6 @@ static void handle(void* handle) {
     }
   }
 
-
-//  while(true) {
-//    long len = clientHandle->serverSocket->recvMessage(sockfd, buf, 100);
-//    if (len <= 0)
-//      continue;
-//    if (strcmp(buf, "logout") == 0) {
-//      clientHandle->serverSocket->closeConn(sockfd);
-//      printf("Current Online Users: ");
-//      for(auto p: clientHandle->serverSocket->getClients()) {
-//        printf("%d, ", p);
-//      }
-//      printf("\n");
-//      LOG_INFO("[%d] logout", sockfd)
-//      return;
-//    }
-//    printf("%sRecv from [%d] Message: [%s]%s\n", CYAN, sockfd, buf, NONE);
-//    clientHandle->serverSocket->broadcast(buf,strlen(buf));
-//    //printf("%sSend from [%d] Message: [%s]%s\n", CYAN, sockfd, buf, NONE);
-//    //clientHandle->serverSocket->sendMessage(sockfd, buf, strlen(buf));
-//  }
 }
 
 int RinaServer::init(int port) {
@@ -195,6 +180,7 @@ int RinaServer::addMessage(Message &msg) {
 #warning add thread lock here
   auto* newMsg = new Message(msg);
   this->messages.push_back(newMsg);
+  LOG_INFO("%s:%s\n", newMsg->getUsername().c_str(), newMsg->getContent().c_str());
   return 0;
 }
 

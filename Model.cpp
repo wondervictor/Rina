@@ -46,6 +46,7 @@ std::string Message::toString() {
   cJSON_AddNumberToObject(messageJSON, "timestamp", this->timestamp);
   cJSON_AddItemToArray(jsonArray, messageJSON);
   std::string p = cJSON_Print(jsonArray);
+  cJSON_Delete(jsonArray);
   return p;
 }
 
@@ -58,15 +59,17 @@ Message::Message(const Message &msg) {
 
 std::string MultiMessage::toString() {
   cJSON* jsonArray = cJSON_CreateArray();
+  printf("MSGS: %d\n", messages.size());
   for (auto& msg: this->messages) {
     cJSON* msgJSON = cJSON_CreateObject();
+    cJSON_AddItemToArray(jsonArray, msgJSON);
     cJSON_AddStringToObject(msgJSON, "name", msg.getUsername().c_str());
     cJSON_AddStringToObject(msgJSON, "content", msg.getContent().c_str());
     cJSON_AddStringToObject(msgJSON, "ip", msg.getAddress().c_str());
     cJSON_AddNumberToObject(msgJSON, "timestamp", msg.getTime());
-    cJSON_AddItemToArray(jsonArray, msgJSON);
   }
   std::string p = cJSON_Print(jsonArray);
+  cJSON_Delete(jsonArray);
   return p;
 }
 
@@ -76,7 +79,7 @@ int parseMessage(char* str, std::vector<Message>& messages) {
   cJSON* root;
   root = cJSON_Parse(str);
   int len = cJSON_GetArraySize(root);
-  printf("Array Size: %d", len);
+  printf("Array Size: %d\n", len);
   cJSON* item;
   for(auto i = 0; i < len; i ++) {
     item = cJSON_GetArrayItem(root, i);
@@ -88,6 +91,7 @@ int parseMessage(char* str, std::vector<Message>& messages) {
     Message message(name, content, ip, timestamp);
     messages.push_back(message);
   }
+  cJSON_Delete(root);
   return (int)messages.size();
 }
 
