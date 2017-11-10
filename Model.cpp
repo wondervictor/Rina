@@ -6,8 +6,9 @@
 
 #include "Model.h"
 #include "cJSON.h"
-#include <time.h>
-#include <stdlib.h>
+#include <ctime>
+#include <string>
+#include <cstdlib>
 
 namespace Rina {
 
@@ -19,6 +20,8 @@ MessageType Message::getType() {
     return logout;
   } else if (content == GET_ALL) {
     return getall;
+  } else if (content == LOGIN_SUCCESS){
+    return success;
   } else {
     return normal;
   }
@@ -33,7 +36,7 @@ Message& Message::operator=(const Message &msg) {
 }
 
 
-void Message::toString(std::string &p) {
+std::string Message::toString() {
 
   cJSON* jsonArray = cJSON_CreateArray();
   cJSON* messageJSON = cJSON_CreateObject();
@@ -42,7 +45,8 @@ void Message::toString(std::string &p) {
   cJSON_AddStringToObject(messageJSON, "ip", this->ipAddress.c_str());
   cJSON_AddNumberToObject(messageJSON, "timestamp", this->timestamp);
   cJSON_AddItemToArray(jsonArray, messageJSON);
-  p = cJSON_Print(jsonArray);
+  std::string p = cJSON_Print(jsonArray);
+  return p;
 }
 
 Message::Message(const Message &msg) {
@@ -52,7 +56,7 @@ Message::Message(const Message &msg) {
   this->ipAddress = msg.ipAddress;
 }
 
-void MultiMessage::toString(std::string &p) {
+std::string MultiMessage::toString() {
   cJSON* jsonArray = cJSON_CreateArray();
   for (auto& msg: this->messages) {
     cJSON* msgJSON = cJSON_CreateObject();
@@ -62,13 +66,15 @@ void MultiMessage::toString(std::string &p) {
     cJSON_AddNumberToObject(msgJSON, "timestamp", msg.getTime());
     cJSON_AddItemToArray(jsonArray, msgJSON);
   }
-  p = cJSON_Print(jsonArray);
+  std::string p = cJSON_Print(jsonArray);
+  return p;
 }
 
 
-int parseMessage(const std::string& messageStr, std::vector<Message>& messages) {
+int parseMessage(char* str, std::vector<Message>& messages) {
+  printf("Message: %s\n", str);
   cJSON* root;
-  root = cJSON_Parse(messageStr.c_str());
+  root = cJSON_Parse(str);
   int len = cJSON_GetArraySize(root);
   printf("Array Size: %d", len);
   cJSON* item;

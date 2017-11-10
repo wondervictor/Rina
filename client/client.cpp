@@ -77,14 +77,35 @@ int RinaClient::login(std::string &server, int port) {
       std::string sendbuf = LOGIN;
       long time = getTime();
       Message message = Message(user->name, sendbuf, DefaultIP, time);
-      flag = this->clientSocket->sendMessage(&message, sizeof(message));
+      const char* msg = message.toString().c_str();
+      size_t strLen = strlen(msg);
+      char sendMsg[strLen];
+      strcpy(sendMsg, msg);
+      this->clientSocket->sendMessage(sendMsg, strlen(sendMsg));
+      LOG_INFO("Send Msg: %s \n%lu", sendMsg, strlen(sendMsg));
+      char recvBuf[1024];
+      std::vector<Message> messages;
+      ssize_t recvLen = this->clientSocket->recvMessage(recvBuf, 1024);
+      LOG_INFO("Recv Msg: %s", recvBuf);
+      int messageNum = parseMessage(recvBuf, messages);
+      Message recvMsg = messages[0];
+      if (recvMsg.getType()==success){
+        LOG_INFO("Login Success")
+      }
     }
     else if (strcmp(buf, "logout") == 0) {
       LOG_INFO("Preparing to log out")
       std::string sendbuf = LOGOUT;
       long time = getTime();
       Message message = Message(user->name, sendbuf, DefaultIP, time);
-      this->clientSocket->sendMessage(&message, sizeof(message));
+
+      const char* msg = message.toString().c_str();
+      size_t strLen = strlen(msg);
+      char sendMsg[strLen];
+      strcpy(sendMsg, msg);
+      this->clientSocket->sendMessage(&sendMsg, strlen(sendMsg));
+      LOG_INFO("Send Msg: %s \n%lu", sendMsg, strlen(sendMsg));
+
       logout();
       break;
     } else if (strcmp(buf, "getall") == 0){
@@ -92,7 +113,12 @@ int RinaClient::login(std::string &server, int port) {
       std::string sendbuf = GET_ALL;
       long time = getTime();
       Message message = Message(user->name, sendbuf, DefaultIP, time);
-      flag = this->clientSocket->sendMessage(&message, sizeof(message));
+      const char* msg = message.toString().c_str();
+      size_t strLen = strlen(msg);
+      char sendMsg[strLen];
+      strcpy(sendMsg, msg);
+      this->clientSocket->sendMessage(&sendMsg, strlen(sendMsg));
+      LOG_INFO("Send Msg: %s \n%lu", sendMsg, strlen(sendMsg));
 
       if (flag == SOCKET_ERROR) {
         LOG_WARN("Send Server Failed: %s",GET_ALL)
@@ -100,41 +126,50 @@ int RinaClient::login(std::string &server, int port) {
       } else {
         printf("Send to Server: %s\n", GET_ALL);
       }
-      auto messages = MultiMessage();
-      ssize_t recvLen = this->clientSocket->recvMessage(&messages, 1024);
+      //auto messages = MultiMessage();
+      char recvBuf[1024];
+      std::vector<Message> messages;
+      ssize_t recvLen = this->clientSocket->recvMessage(recvBuf, 1024);
+      int messageNum = parseMessage(recvBuf, messages);
       if (recvLen == 0)
         continue;
       if (recvLen == SOCKET_ERROR) {
         LOG_WARN("Receive Server Failed: %s",buf)
         continue;
       } else {
-        this->handleMessages(&messages);
+        this->handleMessages(messages);
       }
       continue;
     } else {
       std::string content = buf;
       long time = getTime();
       Message message = Message(user->name, content, DefaultIP, time);
-      this->clientSocket->sendMessage(&message, sizeof(message));
+      const char* msg = message.toString().c_str();
+      size_t strLen = strlen(msg);
+      char sendMsg[strLen];
+      strcpy(sendMsg, msg);
+      this->clientSocket->sendMessage(&sendMsg, strlen(sendMsg));
+      LOG_INFO("Send Msg: %s \n%lu", sendMsg, strlen(sendMsg));
+
       continue;
     }
 
-    if (flag == SOCKET_ERROR) {
-      LOG_WARN("Send Server Failed: %s",buf);
-      continue;
-    } else {
-      printf("Send to Server: %s\n", buf);
-    }
-
-    ssize_t recvLen = this->clientSocket->recvMessage(buf, 1024);
-    if (recvLen == 0)
-      continue;
-    if (recvLen == SOCKET_ERROR) {
-      LOG_WARN("Receive Server Failed: %s",buf)
-      continue;
-    } else {
-      printf("Received from server: %s\n", buf);
-    }
+//    if (flag == SOCKET_ERROR) {
+//      LOG_WARN("Send Server Failed: %s",buf);
+//      continue;
+//    } else {
+//      printf("Send to Server: %s\n", buf);
+//    }
+//
+//    ssize_t recvLen = this->clientSocket->recvMessage(buf, 1024);
+//    if (recvLen == 0)
+//      continue;
+//    if (recvLen == SOCKET_ERROR) {
+//      LOG_WARN("Receive Server Failed: %s",buf)
+//      continue;
+//    } else {
+//      printf("Received from server: %s\n", buf);
+//    }
   }
   //manager->createThread(0, handleSendMessage, (void* )&this->clientSocket);
   //manager->createThread(1, handleRecvMesage, (void* )&this->clientSocket);
@@ -143,12 +178,12 @@ int RinaClient::login(std::string &server, int port) {
   return 0;
 }
 
-int RinaClient::handleMessages(MultiMessage *messages) {
-  auto iter = messages->messages.begin();
-  for (; iter != messages->messages.end(); iter ++) {
+int RinaClient::handleMessages(std::vector<Message>&messages) {
+  auto iter = messages.begin();
+  for (; iter != messages.end(); iter ++) {
     printf("[%ld] %s(%s): %s\n", iter->getTime(), iter->getUsername().c_str(), iter->getAddress().c_str(),iter->getContent().c_str());
   }
-  delete messages;
+  //delete messages;
   return 0;
 }
 

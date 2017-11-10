@@ -6,7 +6,8 @@
 
 #include "server.h"
 #include "../log/log.h"
-#include <string.h>
+#include <cstring>
+#include <string>
 #include <arpa/inet.h>
 
 #define BUF_SIZE 1024
@@ -25,15 +26,20 @@ struct __handle {
 static void handle(void* handle) {
 
   auto* clientHandle = (__handle* )handle;
-  Message msgBuf;
+  char buf[1024];
   int sockfd = clientHandle->fd;
   LOG_INFO("Waiting for message")
   while(true) {
-    long len = clientHandle->serverSocket->recvMessage(sockfd, &msgBuf, BUF_SIZE);
+    long len = clientHandle->serverSocket->recvMessage(sockfd, buf, BUF_SIZE);
+    LOG_INFO("Recv Msg: %s, len: %lu", buf, len);
+    std::vector<Message> recvs;
+    parseMessage(buf, recvs);
+    Message recvMsg = recvs[0];
+
     if (len <= 0)
       continue;
-    if (msgBuf.getType() == login) {
-      std::string username = msgBuf.getUsername();
+    if (recvMsg.getType() == login) {
+      std::string username = recvMsg.getUsername();
       sockaddr_in addr = clientHandle->serverSocket->getClients()[sockfd];
       std::string userIP = inet_ntoa(addr.sin_addr);
       //std::string userIP = msgBuf.getAddress();
@@ -47,9 +53,15 @@ static void handle(void* handle) {
       long timestamp = getTime();
       std::string responseMsg = LOGIN_SUCCESS;
       Message response(ServerName, responseMsg, DefaultIP, timestamp);
-      clientHandle->serverSocket->sendMessage(sockfd, &response, sizeof(response));
-    } else if (msgBuf.getType() == logout) {
-      std::string username = msgBuf.getUsername();
+      const char* msg = response.toString().c_str();
+      size_t strLen = strlen(msg);
+      char sendMsg[strLen];
+      strcpy(sendMsg, msg);
+
+      clientHandle->serverSocket->sendMessage(sockfd, sendMsg, strlen(sendMsg));
+
+    } else if (recvMsg.getType() == logout) {
+      std::string username = recvMsg.getUsername();
       User tmpUser;
       tmpUser.sockfd = sockfd;
       tmpUser.name = username;
@@ -60,7 +72,7 @@ static void handle(void* handle) {
       //Message response(ServerName, responseMsg, DefaultIP, timestamp);
       //clientHandle->serverSocket->sendMessage(sockfd, &response, sizeof(response));
 
-    } else if (msgBuf.getType() == getall) {
+    } else if (recvMsg.getType() == getall) {
 
       User user = clientHandle->server->getUser(sockfd);
       long updateSeq = user.updateSeq;
@@ -71,9 +83,14 @@ static void handle(void* handle) {
       user.updateSeq = updateSeq;
       clientHandle->server->updateUser(sockfd, user);
       MultiMessage message(messages);
-      clientHandle->serverSocket->sendMessage(sockfd, &message, sizeof(message));
+      const char* msg = message.toString().c_str();
+      size_t strLen = strlen(msg);
+      char sendMsg[strLen];
+      strcpy(sendMsg, msg);
+      clientHandle->serverSocket->sendMessage(sockfd, sendMsg, strlen(sendMsg));
+
     } else {
-      clientHandle->server->addMessage(msgBuf);
+      clientHandle->server->addMessage(recvMsg);
     }
   }
 

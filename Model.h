@@ -68,7 +68,7 @@ class Message {
   std::string getAddress() const { return ipAddress; }
   MessageType getType();
   long getTime() const { return timestamp; }
-  void toString(std::string& p);
+  std::string toString();
 
  private:
   std::string username;
@@ -82,11 +82,11 @@ class MultiMessage {
   MultiMessage()= default;
   std::vector<Message> messages;
   MultiMessage(std::vector<Message>& msgs):messages(msgs){};
-  void toString(std::string& p);
+  std::string toString();
 };
 
 
-int parseMessage(const std::string& messageStr, std::vector<Message>& message);
+int parseMessage(char* str, std::vector<Message>& message);
 
 
 struct User {

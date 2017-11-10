@@ -24,7 +24,7 @@ class RinaClient {
   void createUser(std::string& name);
   int login(std::string&, int);
   int logout();
-  int handleMessages(MultiMessage* messages);
+  int handleMessages(std::vector<Message>&messages);
 
  private:
   User* user;
