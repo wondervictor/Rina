@@ -5,12 +5,21 @@
  * */
 
 #include "Model.h"
-#include "cJSON.h"
+#include "rapidjson/rapidjson.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/document.h"
+#include "rapidjson/filereadstream.h"
+#include "rapidjson/writer.h"
 #include <ctime>
 #include <string>
 #include <cstdlib>
 
 namespace Rina {
+
+using rapidjson::Document;
+using rapidjson::Value;
+using rapidjson::Writer;
+using rapidjson::StringBuffer;
 
 MessageType Message::getType() {
   std::string content = this->content;
@@ -38,15 +47,20 @@ Message& Message::operator=(const Message &msg) {
 
 std::string Message::toString() {
 
-  cJSON* jsonArray = cJSON_CreateArray();
-  cJSON* messageJSON = cJSON_CreateObject();
-  cJSON_AddStringToObject(messageJSON, "name", this->username.c_str());
-  cJSON_AddStringToObject(messageJSON, "content", this->content.c_str());
-  cJSON_AddStringToObject(messageJSON, "ip", this->ipAddress.c_str());
-  cJSON_AddNumberToObject(messageJSON, "timestamp", this->timestamp);
-  cJSON_AddItemToArray(jsonArray, messageJSON);
-  std::string p = cJSON_Print(jsonArray);
-  cJSON_Delete(jsonArray);
+  Document jsonDoc;
+  Document::AllocatorType &allocator = jsonDoc.GetAllocator();
+  jsonDoc.SetArray();
+  Value contentObj(rapidjson::kObjectType);
+  contentObj.AddMember("name", this->username, jsonDoc.GetAllocator());
+  contentObj.AddMember("content", this->content, allocator);
+  contentObj.AddMember("ip", this->ipAddress, allocator);
+  contentObj.AddMember("timestamp", this->timestamp, allocator);
+  jsonDoc.PushBack(contentObj, allocator);
+  StringBuffer buffer;
+  Writer<StringBuffer> writer(buffer);
+  jsonDoc.Accept(writer);
+  std::string p= buffer.GetString();
+
   return p;
 }
 
@@ -58,40 +72,53 @@ Message::Message(const Message &msg) {
 }
 
 std::string MultiMessage::toString() {
-  cJSON* jsonArray = cJSON_CreateArray();
-  printf("MSGS: %d\n", messages.size());
+
+  Document jsonDoc;
+  Document::AllocatorType &allocator = jsonDoc.GetAllocator();
+  jsonDoc.SetArray();
+  printf("MSGS: %ld\n", messages.size());
   for (auto& msg: this->messages) {
-    cJSON* msgJSON = cJSON_CreateObject();
-    cJSON_AddItemToArray(jsonArray, msgJSON);
-    cJSON_AddStringToObject(msgJSON, "name", msg.getUsername().c_str());
-    cJSON_AddStringToObject(msgJSON, "content", msg.getContent().c_str());
-    cJSON_AddStringToObject(msgJSON, "ip", msg.getAddress().c_str());
-    cJSON_AddNumberToObject(msgJSON, "timestamp", msg.getTime());
+    Value contentObj(rapidjson::kObjectType);
+    contentObj.AddMember("name", msg.getUsername(), jsonDoc.GetAllocator());
+    contentObj.AddMember("content", msg.getContent(), allocator);
+    contentObj.AddMember("ip", msg.getAddress(), allocator);
+    contentObj.AddMember("timestamp", msg.getTime(), allocator);
+    jsonDoc.PushBack(contentObj, allocator);
+
   }
-  std::string p = cJSON_Print(jsonArray);
-  cJSON_Delete(jsonArray);
+  StringBuffer buffer;
+  Writer<StringBuffer> writer(buffer);
+  jsonDoc.Accept(writer);
+  std::string p= buffer.GetString();
+
   return p;
 }
 
 
 int parseMessage(char* str, std::vector<Message>& messages) {
   printf("Message: %s\n", str);
-  cJSON* root;
-  root = cJSON_Parse(str);
-  int len = cJSON_GetArraySize(root);
-  printf("Array Size: %d\n", len);
-  cJSON* item;
-  for(auto i = 0; i < len; i ++) {
-    item = cJSON_GetArrayItem(root, i);
-    std::string name = cJSON_GetObjectItem(item, "name")->valuestring;
-    std::string content = cJSON_GetObjectItem(item, "content")->valuestring;
-    std::string ip = cJSON_GetObjectItem(item, "ip")->valuestring;
-    int timestamp = cJSON_GetObjectItem(item, "timestamp")->valueint;
 
-    Message message(name, content, ip, timestamp);
-    messages.push_back(message);
+  Document jsonDoc;
+  //FileReadStream inputBuffer(inputStr);
+  jsonDoc.Parse(str);
+  if (jsonDoc.HasParseError()) {
+    printf("Parse Error");
+    return -1;
   }
-  cJSON_Delete(root);
+
+  if (jsonDoc.IsArray() && !jsonDoc.Empty()) {
+    jsonDoc.SetArray();
+    for (rapidjson::SizeType i = 0; i < jsonDoc.Size(); i ++) {
+      const Value& object = jsonDoc[i];
+      std::string name = object["name"].GetString();
+      std::string content = object["content"].GetString();
+      std::string ip = object["ip"].GetString();
+      int timestamp = object["timestamp"].GetInt();
+      Message message(name, content, ip, timestamp);
+      messages.push_back(message);
+    }
+  }
+
   return (int)messages.size();
 }
 

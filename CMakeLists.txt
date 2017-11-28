@@ -10,7 +10,7 @@ add_subdirectory(client)
 add_subdirectory(socket)
 add_subdirectory(thread)
 add_subdirectory(server)
-
+find_package(RapidJSON)
 aux_source_directory(. DIR_SRCS)
 
 add_executable(Rina main.cpp)
