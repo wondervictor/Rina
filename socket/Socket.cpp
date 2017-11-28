@@ -114,7 +114,8 @@ int ServerSocket::closeConn(int sockfd) {
 }
 
 
-int ClientSocket::init(int port) {
+int
+ClientSocket::init(int port) {
 
   in_addr_t clientIP = inet_addr("0.0.0.0");
   int sockfd = socket(AF_INET, SOCK_STREAM, 0);

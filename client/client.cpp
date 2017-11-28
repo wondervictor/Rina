@@ -91,6 +91,7 @@ int RinaClient::login(std::string &server, int port) {
       Message recvMsg = messages[0];
       if (recvMsg.getType()==success){
         LOG_INFO("Login Success")
+
       }
     }
     else if (strcmp(buf, "logout") == 0) {
