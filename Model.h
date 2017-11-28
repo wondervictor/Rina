@@ -63,11 +63,11 @@ class Message {
 
   Message& operator=(const Message& );
   Message(const Message& );
-  std::string getUsername() const { return username; }
-  std::string getContent() const { return content; }
-  std::string getAddress() const { return ipAddress; }
+  std::string getUsername()  { return username; }
+  std::string getContent()  { return content; }
+  std::string getAddress() { return ipAddress; }
   MessageType getType();
-  long getTime() const { return timestamp; }
+  long getTime()  { return timestamp; }
   std::string toString();
 
  private:

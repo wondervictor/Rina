@@ -83,6 +83,7 @@ class ClientSocket(object):
 
     def send_message(self, buf):
         self.socket.send(buf)
+        print('Send: %s' % buf)
         logging.info('Send: %s' % buf)
 
     def recv_message(self, size):
@@ -110,6 +111,7 @@ class Client(object):
             if input_str == 'login':
                 message = Message(username, 'LOGIN', '0.0.0.0', int(time.time()))
                 self.socket.send_message(message.generate())
+
                 recv_msgs = self.socket.recv_message(1024)
                 recv_msgs = Message.decode(recv_msgs)
                 msg = recv_msgs[0]
@@ -128,6 +130,7 @@ class Client(object):
                 message = Message(username, 'GET_ALL', '0.0.0.0', int(time.time()))
                 self.socket.send_message(message.generate())
                 recv_msgs = self.socket.recv_message(1024)
+                print(recv_msgs)
                 recv_msgs = Message.decode(recv_msgs)
                 self.handle_messages(recv_msgs)
                 continue
@@ -148,7 +151,7 @@ class Client(object):
 def test():
 
     client = Client()
-    client.login('0.0.0.0', 12124, 'vic')
+    client.login('0.0.0.0', int(sys.argv[1]), 'vic')
 
 
 

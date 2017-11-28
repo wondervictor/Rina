@@ -6,8 +6,8 @@
 
 #include "Model.h"
 #include "rapidjson/rapidjson.h"
-#include "rapidjson/stringbuffer.h"
 #include "rapidjson/document.h"
+#include "rapidjson/stringbuffer.h"
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/writer.h"
 #include <ctime>
@@ -51,10 +51,11 @@ std::string Message::toString() {
   Document::AllocatorType &allocator = jsonDoc.GetAllocator();
   jsonDoc.SetArray();
   Value contentObj(rapidjson::kObjectType);
-  contentObj.AddMember("name", this->username, jsonDoc.GetAllocator());
-  contentObj.AddMember("content", this->content, allocator);
-  contentObj.AddMember("ip", this->ipAddress, allocator);
-  contentObj.AddMember("timestamp", this->timestamp, allocator);
+
+  contentObj.AddMember("name", rapidjson::StringRef(this->getUsername().c_str()), allocator);
+  contentObj.AddMember("content", rapidjson::StringRef(this->getContent().c_str()), allocator);
+  contentObj.AddMember("ip", rapidjson::StringRef(this->getAddress().c_str()), allocator);
+  contentObj.AddMember("timestamp", (int)this->getTime(), allocator);
   jsonDoc.PushBack(contentObj, allocator);
   StringBuffer buffer;
   Writer<StringBuffer> writer(buffer);
@@ -79,12 +80,11 @@ std::string MultiMessage::toString() {
   printf("MSGS: %ld\n", messages.size());
   for (auto& msg: this->messages) {
     Value contentObj(rapidjson::kObjectType);
-    contentObj.AddMember("name", msg.getUsername(), jsonDoc.GetAllocator());
-    contentObj.AddMember("content", msg.getContent(), allocator);
-    contentObj.AddMember("ip", msg.getAddress(), allocator);
-    contentObj.AddMember("timestamp", msg.getTime(), allocator);
+    contentObj.AddMember("name", rapidjson::StringRef(msg.getUsername().c_str()), allocator);
+    contentObj.AddMember("content", rapidjson::StringRef(msg.getContent().c_str()), allocator);
+    contentObj.AddMember("ip", rapidjson::StringRef(msg.getAddress().c_str()), allocator);
+    contentObj.AddMember("timestamp", (int)msg.getTime(), allocator);
     jsonDoc.PushBack(contentObj, allocator);
-
   }
   StringBuffer buffer;
   Writer<StringBuffer> writer(buffer);
@@ -100,14 +100,15 @@ int parseMessage(char* str, std::vector<Message>& messages) {
 
   Document jsonDoc;
   //FileReadStream inputBuffer(inputStr);
-  jsonDoc.Parse(str);
+  jsonDoc.Parse<0>(str);
   if (jsonDoc.HasParseError()) {
     printf("Parse Error");
     return -1;
   }
-
+  printf("Start to Parse\n");
   if (jsonDoc.IsArray() && !jsonDoc.Empty()) {
-    jsonDoc.SetArray();
+    printf("ddwef3\n");
+    //jsonDoc.SetArray();
     for (rapidjson::SizeType i = 0; i < jsonDoc.Size(); i ++) {
       const Value& object = jsonDoc[i];
       std::string name = object["name"].GetString();
@@ -115,6 +116,7 @@ int parseMessage(char* str, std::vector<Message>& messages) {
       std::string ip = object["ip"].GetString();
       int timestamp = object["timestamp"].GetInt();
       Message message(name, content, ip, timestamp);
+
       messages.push_back(message);
     }
   }

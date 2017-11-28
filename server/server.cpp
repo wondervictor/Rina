@@ -26,15 +26,17 @@ struct __handle {
 static void handle(void* handle) {
 
   auto* clientHandle = (__handle* )handle;
-  char buf[1024];
+  //char buf[1024];
   int sockfd = clientHandle->fd;
   LOG_INFO("Waiting for message")
   while(true) {
+    char buf[1024];
     long len = clientHandle->serverSocket->recvMessage(sockfd, buf, BUF_SIZE);
     LOG_INFO("Recv Msg: %s, len: %lu", buf, len);
     std::vector<Message> recvs;
     parseMessage(buf, recvs);
     Message recvMsg = recvs[0];
+    memset(buf, '\0', BUF_SIZE);
 
     if (len <= 0)
       continue;
@@ -53,12 +55,12 @@ static void handle(void* handle) {
       long timestamp = getTime();
       std::string responseMsg = LOGIN_SUCCESS;
       Message response(ServerName, responseMsg, DefaultIP, timestamp);
-      const char* msg = response.toString().c_str();
-      size_t strLen = strlen(msg);
-      char sendMsg[strLen];
-      strcpy(sendMsg, msg);
+      std::string msg = response.toString();
+//      size_t strLen = strlen(msg);
+//      char sendMsg[strLen];
+//      strcpy(sendMsg, msg);
 
-      clientHandle->serverSocket->sendMessage(sockfd, sendMsg, strlen(sendMsg));
+      clientHandle->serverSocket->sendMessage(sockfd, &msg, msg.size());
 
     } else if (recvMsg.getType() == logout) {
       std::string username = recvMsg.getUsername();
