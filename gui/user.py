@@ -18,6 +18,6 @@ class User(object):
         self.state = state
         self.update = update
 
-    def update(self, seq):
+    def update_seq(self, seq):
 
         self.update += seq

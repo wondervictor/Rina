@@ -13,7 +13,6 @@ from common import get_timestamp
 
 buf_size = 1024
 
-
 class Server(object):
 
     def __init__(self, port, ip='0.0.0.0'):
@@ -49,12 +48,12 @@ class Server(object):
                 if msg_type == 'LOGIN':
                     username = msg.get_username()
                     new_user = User(
-                        username,
-                        conn,
-                        UserState.Online,
-                        0
+                        name=username,
+                        conn=conn,
+                        state=UserState.Online,
+                        update=0
                     )
-                    server.login(new_user)
+                    server.login(username, new_user)
                     self.logger.info("[Server]user %s joined" % username)
                     new_msg = Message(
                         name=server.name(),
@@ -79,7 +78,7 @@ class Server(object):
                     conn.send(msg_str)
                     return
 
-                elif msg_type == 'GET_ALL':
+                elif msg_type == 'GET_MESSAGES':
                     username = msg.get_username()
                     messages = server.get_messages(username)
                     self.logger.info("[Server]send to %s count: %s" % (username, len(messages)))
@@ -88,7 +87,7 @@ class Server(object):
 
                 else:
                     username = msg.get_username()
-                    self.logger.info("[Server] user %s send: %s" % (msg.get_content(), username))
+                    self.logger.info("[Server] user %s send: %s" % (username, msg.get_content()))
                     server.add_message(msg)
 
         thread.start_new_thread(event, (self, conn, addr))
@@ -104,8 +103,8 @@ class Server(object):
             conn, addr = self.socket.accept()
             self._handle(conn, addr)
 
-    def login(self, user):
-        self.users[user.name] = user
+    def login(self, username, user):
+        self.users[username] = user
 
     def logout(self, username):
         if username in self.users:
@@ -120,7 +119,7 @@ class Server(object):
         user = self.users[username]
         idx = user.update
         messages = self.messages[idx:]
-        self.users[username].update(len(messages))
+        self.users[username].update_seq(len(messages))
         return messages
 
 

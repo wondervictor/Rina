@@ -6,6 +6,7 @@ import json
 import time
 import os
 import sys
+import common
 from message import Message
 from collections import deque
 
@@ -56,7 +57,7 @@ class Client(object):
                 print(recv_msgs)
                 recv_msgs = Message.decode(recv_msgs)
                 msg = recv_msgs[0]
-                if Message.get_type(msg.content) == 'LOGIN_SUCCESS':
+                if msg.type() == 'SUCCESS':
                     self.logger.info('Login Success')
                 else:
                     self.logger.warn('Login Failed')
@@ -65,10 +66,18 @@ class Client(object):
             if input_str == 'logout':
                 message = Message(username, 'LOGOUT', '0.0.0.0', int(time.time()))
                 self.socket.send_message(message.generate())
+                recv_msgs = self.socket.recv_message(1024)
+                recv_msgs = Message.decode(recv_msgs)
+                msg = recv_msgs[0]
+                if msg.type() == 'SUCCESS':
+                    self.logger.info('Logout Success')
+                else:
+                    self.logger.warn('Logout Failed')
+                    exit()
                 self.logout()
                 break
             if input_str == 'getall':
-                message = Message(username, 'GET_ALL', '0.0.0.0', int(time.time()))
+                message = Message(username, 'GET_MESSAGES', '0.0.0.0', int(time.time()))
                 self.socket.send_message(message.generate())
                 recv_msgs = self.socket.recv_message(1024)
                 print(recv_msgs)
@@ -82,7 +91,8 @@ class Client(object):
     def handle_messages(self, msgs):
 
         for msg in msgs:
-            print('[%s] %s (%s): %s' % (msg.timestamp, msg.name, msg.addr, msg.content))
+            print('[%s] %s (%s): %s' % (common.time_to_str(msg.get_timestamp()), msg.get_username(), msg.get_addr(),
+                                        msg.get_content()))
 
     def logout(self):
 

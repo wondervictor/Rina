@@ -18,10 +18,12 @@ class Message(object):
             return '*2c411521vn148-e=1r'
         if type == 'LOGOUT':
             return 'e21874vnwv1o2870810'
-        if type == 'GET_ALL':
+        if type == 'GET_MESSAGES':
             return '1321c32-23@(*^&*#Bv'
         if type == 'SUCCESS':
             return '&*TBX*GR*&@BC&GF&*@'
+        if type == 'GET_USERS':
+            return '^%R^%XNIHd8912fcqb@'
         return self._content
 
     @staticmethod
@@ -31,7 +33,9 @@ class Message(object):
         if content == 'e21874vnwv1o2870810':
             return 'LOGOUT'
         if content == '1321c32-23@(*^&*#Bv':
-            return 'GET_ALL'
+            return 'GET_MESSAGES'
+        if content == '^%R^%XNIHd8912fcqb@':
+            return 'GET_USERS'
         if content == '&*TBX*GR*&@BC&GF&*@':
             return 'SUCCESS'
         return 'NORMAL'
@@ -92,10 +96,10 @@ class Message(object):
             tmp = dict()
             tmp['name'] = msg.get_username()
             tmp['ip'] = msg.get_addr()
-            type_content = msg.get_type_str(msg.get_type())
+            type_content = msg.get_type_str(msg.type())
             tmp['content'] = type_content
             tmp['timestamp'] = msg.get_timestamp()
-            msgs.append(msg)
+            msgs.append(tmp)
 
         json_enc = json.JSONEncoder()
         json_str = json_enc.encode(msgs)
