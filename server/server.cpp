@@ -55,12 +55,13 @@ static void handle(void* handle) {
       long timestamp = getTime();
       std::string responseMsg = LOGIN_SUCCESS;
       Message response(ServerName, responseMsg, DefaultIP, timestamp);
-      std::string msg = response.toString();
+      const char* msg = response.toString().c_str();
+
 //      size_t strLen = strlen(msg);
 //      char sendMsg[strLen];
 //      strcpy(sendMsg, msg);
 
-      clientHandle->serverSocket->sendMessage(sockfd, &msg, msg.size());
+      clientHandle->serverSocket->sendMessage(sockfd, const_cast<char*>(msg), strlen(msg));
 
     } else if (recvMsg.getType() == logout) {
       std::string username = recvMsg.getUsername();

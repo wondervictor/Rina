@@ -6,70 +6,8 @@ import json
 import time
 import os
 import sys
-
-
-class Message(object):
-
-    def __init__(self, name, type, addr, timestamp, content=None):
-        self.name = name
-        self.type = type
-        self.addr = addr
-        self.content = content
-        self.timestamp = timestamp
-
-    def _get_type_str(self, type):
-
-        if type == 'LOGIN':
-            return '*2c411521vn148-e=1r'
-        if type == 'LOGOUT':
-            return 'e21874vnwv1o2870810'
-        if type == 'GET_ALL':
-            return '1321c32-23@(*^&*#Bv'
-        if type == 'LOGIN_SUCCESS':
-            return '&*TBX*GR*&@BC&GF&*@'
-        return self.content
-
-    @staticmethod
-    def get_type(content):
-        if type == '*2c411521vn148-e=1r':
-            return 'LOGIN'
-        if type == 'e21874vnwv1o2870810':
-            return 'LOGOUT'
-        if type == '1321c32-23@(*^&*#Bv':
-            return 'GET_ALL'
-        if type == '&*TBX*GR*&@BC&GF&*@':
-            return 'LOGIN_SUCCESS'
-        return 'NORMAL'
-
-    def generate(self):
-
-        msg = dict()
-        msg['name'] = self.name
-        msg['ip'] = self.addr
-        type_content = self._get_type_str(self.type)
-        msg['content'] = type_content
-        msg['timestamp'] = self.timestamp
-
-        msgs = [msg]
-
-        json_enc = json.JSONEncoder()
-        json_str = json_enc.encode(msgs)
-        return json_str
-
-    @staticmethod
-    def decode(msg):
-        decoder = json.JSONDecoder()
-        msgs = decoder.decode(msg)
-        messages = []
-        for msg in msgs:
-            name = msg['name']
-            ip = msg['ip']
-            content = msg['content']
-            timestamp = msg['timestamp']
-            messages.append(Message(name, Message.get_type(content), ip, timestamp, content))
-
-        return messages
-
+from message import Message
+from collections import deque
 
 class ClientSocket(object):
 
@@ -113,6 +51,7 @@ class Client(object):
                 self.socket.send_message(message.generate())
 
                 recv_msgs = self.socket.recv_message(1024)
+                print(recv_msgs)
                 recv_msgs = Message.decode(recv_msgs)
                 msg = recv_msgs[0]
                 if Message.get_type(msg.content) == 'LOGIN_SUCCESS':
@@ -151,7 +90,7 @@ class Client(object):
 def test():
 
     client = Client()
-    client.login('0.0.0.0', int(sys.argv[1]), 'vic')
+    client.login('0.0.0.0', int(sys.argv[1]), sys.argv[2])
 
 
 

@@ -78,10 +78,12 @@ std::string MultiMessage::toString() {
   Document::AllocatorType &allocator = jsonDoc.GetAllocator();
   jsonDoc.SetArray();
   printf("MSGS: %ld\n", messages.size());
-  for (auto& msg: this->messages) {
+  for (auto msg: this->messages) {
+    const char* content = msg.getContent().c_str();
+    printf("msg content: %s \n", msg.getContent().c_str());
     Value contentObj(rapidjson::kObjectType);
     contentObj.AddMember("name", rapidjson::StringRef(msg.getUsername().c_str()), allocator);
-    contentObj.AddMember("content", rapidjson::StringRef(msg.getContent().c_str()), allocator);
+    contentObj.AddMember("content", rapidjson::StringRef(content), allocator);
     contentObj.AddMember("ip", rapidjson::StringRef(msg.getAddress().c_str()), allocator);
     contentObj.AddMember("timestamp", (int)msg.getTime(), allocator);
     jsonDoc.PushBack(contentObj, allocator);
