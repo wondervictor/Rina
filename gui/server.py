@@ -2,9 +2,10 @@
 
 
 import socket
-import logging
+import log
 import thread
 import time
+import sys
 from message import Message
 from user import User, UserState
 from common import get_timestamp
@@ -20,6 +21,8 @@ class Server(object):
         self.socket.bind((ip, port))
         self.users = dict()
         self.addr = ip
+        self.messages = []
+        self.logger = log.Logger('Server')
 
     def name(self):
         return "SERVER"
@@ -29,7 +32,7 @@ class Server(object):
         def event(server, _conn, _addr):
 
             if not isinstance(server, Server):
-                logging.error("server is not the RIGHT instance")
+                self.logger.error("server is not the RIGHT instance")
                 exit(-1)
 
             while True:
@@ -37,9 +40,9 @@ class Server(object):
                 if len(msg) == 0:
                     continue
                 msg = Message.decode(msg)[0]
-                logging.info("Server Recv: %s" % msg)
+                self.logger.info("[Server]Recv: %s" % msg)
                 if not isinstance(msg, Message):
-                    logging.warning("Server: message error")
+                    self.logger.warn("[Server]message error")
                     continue
                 msg_type = msg.type()
 
@@ -51,11 +54,11 @@ class Server(object):
                         UserState.Online,
                         0
                     )
-                    server.add_user(new_user)
-                    logging.info("Server: user %s joined" % username)
+                    server.login(new_user)
+                    self.logger.info("[Server]user %s joined" % username)
                     new_msg = Message(
                         name=server.name(),
-                        type='LOGIN_SUCCESS',
+                        type='SUCCESS',
                         addr=server.addr,
                         timestamp=get_timestamp()
                     )
@@ -63,34 +66,71 @@ class Server(object):
                     conn.send(msg_str)
 
                 elif msg_type == 'LOGOUT':
-
+                    username = msg.get_username()
+                    server.logout(username)
+                    self.logger.info("[Server]user %s leaved" % username)
+                    new_msg = Message(
+                        name=server.name(),
+                        type='SUCCESS',
+                        addr=server.addr,
+                        timestamp=get_timestamp()
+                    )
+                    msg_str = new_msg.generate()
+                    conn.send(msg_str)
+                    return
 
                 elif msg_type == 'GET_ALL':
-
-
+                    username = msg.get_username()
+                    messages = server.get_messages(username)
+                    self.logger.info("[Server]send to %s count: %s" % (username, len(messages)))
+                    msg_str = Message.generate_many(messages)
+                    conn.send(msg_str)
 
                 else:
-                    continue
+                    username = msg.get_username()
+                    self.logger.info("[Server] user %s send: %s" % (msg.get_content(), username))
+                    server.add_message(msg)
 
-
-
-
+        thread.start_new_thread(event, (self, conn, addr))
+        self.logger.info("[Server] Create a new thread")
 
     def start(self):
 
-        logging.info("Server is running ...")
+        self.logger.info("Server is running ...")
 
         self.socket.listen(20)
         while True:
 
             conn, addr = self.socket.accept()
+            self._handle(conn, addr)
 
-
-    def add_user(self, user):
-
+    def login(self, user):
         self.users[user.name] = user
 
+    def logout(self, username):
+        if username in self.users:
+            del self.users[username]
+
     def add_message(self, message):
+
+        self.messages.append(message)
+
+    def get_messages(self, username):
+
+        user = self.users[username]
+        idx = user.update
+        messages = self.messages[idx:]
+        self.users[username].update(len(messages))
+        return messages
+
+
+def test():
+
+    server = Server(int(sys.argv[1]))
+    server.start()
+
+test()
+
 
 
 

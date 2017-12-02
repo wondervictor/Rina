@@ -12,7 +12,7 @@ class Message(object):
         self._content = content
         self._timestamp = timestamp
 
-    def _get_type_str(self, type):
+    def get_type_str(self, type):
 
         if type == 'LOGIN':
             return '*2c411521vn148-e=1r'
@@ -20,7 +20,7 @@ class Message(object):
             return 'e21874vnwv1o2870810'
         if type == 'GET_ALL':
             return '1321c32-23@(*^&*#Bv'
-        if type == 'LOGIN_SUCCESS':
+        if type == 'SUCCESS':
             return '&*TBX*GR*&@BC&GF&*@'
         return self._content
 
@@ -33,7 +33,7 @@ class Message(object):
         if content == '1321c32-23@(*^&*#Bv':
             return 'GET_ALL'
         if content == '&*TBX*GR*&@BC&GF&*@':
-            return 'LOGIN_SUCCESS'
+            return 'SUCCESS'
         return 'NORMAL'
 
     def type(self):
@@ -56,7 +56,7 @@ class Message(object):
         msg = dict()
         msg['name'] = self._name
         msg['ip'] = self._addr
-        type_content = self._get_type_str(self._type)
+        type_content = self.get_type_str(self._type)
         msg['content'] = type_content
         msg['timestamp'] = self._timestamp
 
@@ -83,3 +83,22 @@ class Message(object):
 
         return "<Message Name: %s Content: %s Addr: %s Time: %s Type: %s>" % \
                (self._name, self._content, self._addr, self._timestamp, self.get_type(self._content))
+
+    @staticmethod
+    def generate_many(messages):
+
+        msgs = []
+        for msg in messages:
+            tmp = dict()
+            tmp['name'] = msg.get_username()
+            tmp['ip'] = msg.get_addr()
+            type_content = msg.get_type_str(msg.get_type())
+            tmp['content'] = type_content
+            tmp['timestamp'] = msg.get_timestamp()
+            msgs.append(msg)
+
+        json_enc = json.JSONEncoder()
+        json_str = json_enc.encode(msgs)
+        return json_str
+
+

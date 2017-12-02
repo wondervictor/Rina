@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import socket
-import logging
+import log
 import json
 import time
 import os
@@ -9,12 +9,13 @@ import sys
 from message import Message
 from collections import deque
 
+
 class ClientSocket(object):
 
     def __init__(self):
-
+        self.logger = log.Logger('ClientSocket')
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        logging.info("Client Init")
+        self.logger.info("Client Init")
 
     def conn(self, server_ip, port):
         self.socket.connect((server_ip, port))
@@ -22,7 +23,7 @@ class ClientSocket(object):
     def send_message(self, buf):
         self.socket.send(buf)
         print('Send: %s' % buf)
-        logging.info('Send: %s' % buf)
+        self.logger.info('Send: %s' % buf)
 
     def recv_message(self, size):
         msg = self.socket.recv(size)
@@ -35,12 +36,13 @@ class ClientSocket(object):
 class Client(object):
 
     def __init__(self):
+        self.logger = log.Logger('Client')
         self.socket = ClientSocket()
         self.username = ''
 
     def login(self, server, port, username):
         self.socket.conn(server, port)
-        logging.info('Conn Success')
+        self.logger.info('Conn Success')
         self.username = username
         while True:
 
@@ -55,9 +57,9 @@ class Client(object):
                 recv_msgs = Message.decode(recv_msgs)
                 msg = recv_msgs[0]
                 if Message.get_type(msg.content) == 'LOGIN_SUCCESS':
-                    logging.info('Login Success')
+                    self.logger.info('Login Success')
                 else:
-                    logging.warning('Login Failed')
+                    self.logger.warn('Login Failed')
                     exit()
                 continue
             if input_str == 'logout':
