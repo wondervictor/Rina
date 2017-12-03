@@ -9,11 +9,13 @@ Date: 2017/10/19
 
 
 from Tkinter import *
+from PIL import Image, ImageTk
 import tkMessageBox
 from client import Client
 from message import Message
 from log import Logger
 import time
+import threading
 
 
 class LoginView(Frame):
@@ -54,27 +56,43 @@ class LoginView(Frame):
 class ChatView(Frame):
 
     def __init__(self, app, master=None):
-        Frame.__init__(self, master)
+        Frame.__init__(self, master, width=410, height=425, bg='gray')
+        self.main_frame = Frame(width=410, height=425, bg='gray')
+        self.main_frame.pack()
         self.app = app
-
-        self.frame_left_top = Frame(width=380, height=270, bg='white')
-        self.frame_left_center = Frame(width=380, height=100, bg='white')
-        self.frame_left_bottom = Frame(width=380, height=20)
-        self.frame_right = Frame(width=170, height=400, bg='white')
+        # message
+        self.frame_left_top = Frame(self.main_frame, width=300, height=270, bg='white')
+        # send message
+        self.frame_left_center = Frame(self.main_frame, width=300, height=100, bg='white')
+        # button
+        self.frame_left_bottom = Frame(self.main_frame, width=300, height=30, bg='white')
+        # users
+        self.frame_right = Frame(self.main_frame, width=100, height=270, bg='white')
+        self.frame_right_down = Frame(self.main_frame, width=100, height=130, bg='white')
 
         self.text_msglist = Text(self.frame_left_top)
         self.text_msg = Text(self.frame_left_center)
-        self.button_sendmsg = Button(self.frame_left_bottom, text='发送', command=self.send_message)
+        self.uset_list = Text(self.frame_right)
+
+        self.button_sendmsg = Button(self.frame_left_bottom, bg="#00BFFF", fg="white",text='发送', command=self.send_message)
         self.text_msglist.tag_config('green', foreground='#008B00')
-        self.frame_left_top.grid(row=0, column=0, padx=2, pady=5)
-        self.frame_left_center.grid(row=1, column=0, padx=2, pady=5)
+        photo = ImageTk.PhotoImage(Image.open('avatar.gif')) #PhotoImage(file='avatar.gif')
+        self.avatar_view = Label(self.frame_right_down, image=photo)
+        self.avatar_view.image = photo
+        self.frame_left_top.grid(row=0, column=0, padx=2, pady=3)
+        self.frame_left_center.grid(row=1, padx=2, pady=3)
         self.frame_left_bottom.grid(row=2, column=0)
-        self.frame_right.grid(row=0, column=1, rowspan=3, padx=4, pady=5)
+        self.frame_right.grid(row=0, column=1, padx=2)
+        self.frame_right_down.grid(row=1, column=1, padx=2, rowspan=2, pady=3)
         self.frame_left_top.grid_propagate(0)
         self.frame_left_center.grid_propagate(0)
         self.frame_left_bottom.grid_propagate(0)
+        self.frame_right.grid_propagate(0)
+        self.frame_right_down.grid_propagate(0)
         self.text_msglist.grid()
         self.text_msg.grid()
+        self.uset_list.grid()
+        self.avatar_view.grid()
         self.button_sendmsg.grid(sticky=E)
 
     def send_message(self):
@@ -94,6 +112,14 @@ class ChatView(Frame):
             self.app.logger.info("Send Success")
 
         self.app.send(content, send_callback)
+
+    def update_user_list(self, user_list):
+
+        pass
+
+    def update_messages(self, messages):
+
+        pass
 
 
 class Application(object):
@@ -119,7 +145,7 @@ class Application(object):
         def login_callback(message):
             msg = message[0]
             if msg.type() == 'SUCCESS':
-                tkMessageBox.showinfo("提示信息", "登录成功")
+                # tkMessageBox.showinfo("提示信息", "登录成功")
                 self.open_chat()
             else:
                 tkMessageBox.showinfo("提示信息", "登录失败")
@@ -136,6 +162,13 @@ class Application(object):
             callback=login_callback
         )
 
+    def update_info(self):
+        pass
+
+
+
+
+
     def start(self):
 
         self.current_view = LoginView(self, self.root)
@@ -143,12 +176,11 @@ class Application(object):
         self.root.mainloop()
 
     def send(self, msg_str, callback):
-
         self.client.send_message(msg_str, callback)
 
     def open_chat(self):
         self.current_view.destroy()
-        self._resize_window(800, 400)
+        self._resize_window(410, 425)
         self.current_view = ChatView(self)
 
 
