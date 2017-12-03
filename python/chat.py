@@ -28,7 +28,7 @@ frame_left_bottom   = Frame(width=380, height=20)
 frame_right         = Frame(width=170, height=400, bg='white')
 ##创建需要的几个元素
 text_msglist        = Text(frame_left_top)
-text_msg            = Text(frame_left_center);
+text_msg            = Text(frame_left_center)
 button_sendmsg      = Button(frame_left_bottom, text='发送', command=sendmessage)
 #创建一个绿色的tag
 text_msglist.tag_config('green', foreground='#008B00')

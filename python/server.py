@@ -104,6 +104,14 @@ class Server(object):
                     username = msg.get_username()
                     self.logger.info("[Server] user %s send: %s" % (username, msg.get_content()))
                     server.add_message(msg)
+                    new_msg = Message(
+                        name=server.name(),
+                        type='SUCCESS',
+                        addr=server.addr,
+                        timestamp=get_timestamp()
+                    )
+                    msg_str = new_msg.generate()
+                    conn.send(msg_str)
 
         thread.start_new_thread(event, (self, conn, addr))
         self.logger.info("[Server] Create a new thread")

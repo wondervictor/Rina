@@ -159,6 +159,10 @@ class Client(object):
         for us in users:
             print(us)
 
+    def send_message(self, msg, callback):
+        message = Message(self.username, 'NORMAL', '0.0.0.0', int(time.time()), content=msg)
+        self.send_recv(message, callback)
+
     @staticmethod
     def handle_messages(msgs):
 
