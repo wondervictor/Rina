@@ -11,6 +11,7 @@ import thread
 from message import Message
 import Queue
 
+
 class ClientSocket(object):
 
     def __init__(self):
@@ -84,7 +85,8 @@ class Client(object):
                     else:
                         self.logger.warn('Logout Failed')
                         exit()
-                    self.logout()
+                    self.logger.info("Logout")
+
                 self.send_recv(message, callback_func)
                 if callback:
                     callback(message)
@@ -92,7 +94,7 @@ class Client(object):
 
             if input_str == 'getall':
                 message = Message(username, 'GET_MESSAGES', '0.0.0.0', int(time.time()))
-                self.send_recv(message, self.handle_messages)
+                self.send_recv(message, Client.handle_messages)
 
                 if callback:
                     callback(message)
@@ -101,9 +103,9 @@ class Client(object):
             if input_str == 'getuser':
                 message = Message(username, 'GET_USERS', '0.0.0.0', int(time.time()))
 
-                def callback_func(message):
-                    message = message[0]
-                    self.handle_users(message.get_content())
+                def callback_func(msg):
+                    msg = msg[0]
+                    self.handle_users(msg.get_content())
 
                 self.send_recv(message, callback_func)
 
@@ -132,18 +134,23 @@ class Client(object):
                 (message, callback) = self.message_queue.get()
                 self.request(message, callback)
 
-    def start(self):
-
+    def start(self, server, port, username):
+        self.socket.conn(server, port)
+        self.logger.info('Conn Success')
+        self.username = username
         thread.start_new_thread(self.run_queue, ())
 
     def login(self, username, callback):
         message = Message(username, 'LOGIN', '0.0.0.0', int(time.time()))
+        self.send_recv(message, callback)
 
     def update_message(self, callback):
         message = Message(self.username, 'GET_MESSAGES', '0.0.0.0', int(time.time()))
+        self.send_recv(message, callback)
 
     def update_users(self, callback):
         message = Message(self.username, 'GET_USERS', '0.0.0.0', int(time.time()))
+        self.send_recv(message, callback)
 
     def handle_users(self, userstr):
 
@@ -152,24 +159,22 @@ class Client(object):
         for us in users:
             print(us)
 
-    def handle_messages(self, msgs):
+    @staticmethod
+    def handle_messages(msgs):
 
         for msg in msgs:
             print('[%s] %s (%s): %s' % (common.time_to_str(msg.get_timestamp()), msg.get_username(), msg.get_addr(),
                                         msg.get_content()))
 
-    def logout(self):
-
-        self.logger.info("Logout")
+    def logout(self, callback):
+        message = Message(self.username, 'LOGOUT', '0.0.0.0', int(time.time()))
+        self.send_recv(message, callback)
 
 
 def test():
 
     client = Client()
-    client.start()
-    client.login_start('0.0.0.0', int(sys.argv[1]), sys.argv[2])
-
-
-
+    # client.start()
+    # client.login_start('0.0.0.0', int(sys.argv[1]), sys.argv[2])
 
 test()

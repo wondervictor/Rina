@@ -44,14 +44,13 @@ def center_window(root, width, height):
     screenwidth = root.winfo_screenwidth()
     screenheight = root.winfo_screenheight()
     size = '%dx%d+%d+%d' % (width, height, (screenwidth - width)/2, (screenheight - height)/2)
-    print(size)
     root.geometry(size)
 
 
 def test():
 
     root = Tk()
-    root.wm_attributes('-topmost',1)
+    root.wm_attributes('-topmost', 1)
     center_window(root, 300, 200)
     app = Login(root)
     root.mainloop()
