@@ -13,6 +13,7 @@ from common import get_timestamp
 
 buf_size = 1024
 
+
 class Server(object):
 
     def __init__(self, port, ip='0.0.0.0'):
@@ -85,6 +86,20 @@ class Server(object):
                     msg_str = Message.generate_many(messages)
                     conn.send(msg_str)
 
+                elif msg_type == 'GET_USERS':
+
+                    username = msg.get_username()
+                    self.logger.info("[Server]User: %s Get Users" % username)
+                    new_msg = Message(
+                        name=server.name(),
+                        type='NORMAL',
+                        addr=server.addr,
+                        timestamp=get_timestamp(),
+                        content=server.get_users()
+                    )
+                    msg_str = new_msg.generate()
+                    conn.send(msg_str)
+
                 else:
                     username = msg.get_username()
                     self.logger.info("[Server] user %s send: %s" % (username, msg.get_content()))
@@ -121,6 +136,11 @@ class Server(object):
         messages = self.messages[idx:]
         self.users[username].update_seq(len(messages))
         return messages
+
+    def get_users(self):
+
+        user_str = ','.join(self.users.keys())
+        return user_str
 
 
 def test():
