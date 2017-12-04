@@ -21,30 +21,38 @@ import sys
 from ScrolledText import ScrolledText
 
 
-
-
 class LoginView(Frame):
 
     def __init__(self, app, master=None,):
-        Frame.__init__(self, master, width=200, height=200)
+        Frame.__init__(self, master, width=300, height=200)
         self.app = app
         self.pack()
-        self.user_label = Label(self, text="User:")
-        self.user_label.grid(row=0, column=0, sticky=W)
-        self.user_entry = Entry(self)
-        self.user_entry.grid(row=0, column=1, sticky=W)
 
-        self.server_ip = Label(self, text="IP:")
-        self.server_ip.grid(row=1, column=0, sticky=W)
+        self.center_view = Frame(self, width=100, height=100)
+        self.left_frame = Frame(self, width=130, height=100)
+        self.right_frame = Frame(self, width=140, height=100)
 
-        self.server_entry = Entry(self)
-        self.server_entry.grid(row=1, column=1, sticky=W)
+        self.user_label = Label(self.left_frame, text="用户名:",)
+        self.server_ip = Label(self.left_frame, text="服务器:",)
+        self.user_entry = Entry(self.right_frame, width=14)
 
-        self.login_button = Button(self, text="Login", command=self.login, height=5, width=20)
-        self.login_button.grid(row=2, column=0, sticky=W)
+        self.server_entry = Entry(self.right_frame, width=14)
+        self.login_button = Button(self.center_view, text="登录", command=self.login, height=2, width=13)
+        self.cancel_button = Button(self.center_view, text="取消", command=self.cancel, height=2, width=13)
+        self.left_frame.propagate(0)
+        self.right_frame.propagate(0)
+        self.left_frame.grid(padx=2, pady=2, row=0, column=0)
+        self.right_frame.grid(padx=0, pady=2,row=0, column=1)
+        self.center_view.grid(padx=50, row=1, columnspan=2)
+        self.user_label.grid(row=0)
+        self.user_entry.grid(row=0)
+        self.server_ip.grid(row=1, pady=7)
+        self.server_entry.grid(row=1, pady=7)
+        self.login_button.grid(row=0, pady=4)
+        self.cancel_button.grid(row=1, pady=0)
 
-        self.cancel_button = Button(self, text="Cancel", command=self.cancel)
-        self.cancel_button.grid(row=3, column=0, sticky=W)
+
+
 
     def login(self):
         if not isinstance(self.app, Application):
@@ -208,7 +216,7 @@ class Application(object):
             self.client.update_message(update_message)
             self.client.update_users(update_users)
 
-            timer = threading.Timer(5, request_update)
+            timer = threading.Timer(2, request_update)
             timer.start()
 
         timer = threading.Timer(1, request_update)
@@ -217,7 +225,7 @@ class Application(object):
     def start(self):
 
         self.current_view = LoginView(self, self.root)
-        self._resize_window(400, 200)
+        self._resize_window(300, 200)
         self.root.mainloop()
 
     def send(self, msg_str, callback):
@@ -235,7 +243,8 @@ class Application(object):
         def callback(message):
             if message[0].type() == 'SUCCESS':
                 self.logger.info('[Client] Quit')
-                sys.exit(0)
+                self.root.destroy()
+                thread.exit_thread()
         self.client.logout(callback)
 
 
