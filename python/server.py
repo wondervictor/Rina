@@ -142,6 +142,8 @@ class Server(object):
         user = self.users[username]
         idx = user.update
         messages = self.messages[idx:]
+        if len(messages) > 20:
+            messages = messages[idx:idx+20]
         self.users[username].update_seq(len(messages))
         return messages
 

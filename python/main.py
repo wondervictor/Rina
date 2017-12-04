@@ -51,9 +51,6 @@ class LoginView(Frame):
         self.login_button.grid(row=0, pady=4)
         self.cancel_button.grid(row=1, pady=0)
 
-
-
-
     def login(self):
         if not isinstance(self.app, Application):
             exit(-1)
@@ -80,15 +77,19 @@ class ChatView(Frame):
         # button
         self.frame_left_bottom = Frame(self.main_frame, width=300, height=30, bg='white')
         # users
-        self.scroll_frame = Frame(self.main_frame, width=2, height=270, bg='white')
 
         self.frame_right = Frame(self.main_frame, width=100, height=270, bg='white')
         self.frame_right_down = Frame(self.main_frame, width=100, height=130, bg='white')
-        self.sb = Scrollbar(self.scroll_frame, orient=VERTICAL)
-        self.text_msglist = ScrolledText(self.frame_left_top)
-        self.text_msglist['yscrollcommand'] = self.sb.set
-        self.sb['command'] = self.text_msglist.yview
+        self.sb = Scrollbar(self.frame_left_top, orient=VERTICAL, width=5, bg='white')
+
+        self.text_msglist = Text(self.frame_left_top, width=41, height=17.4)
+
+        self.text_msglist.config(yscrollcommand=self.sb.set)
+        self.sb.config(command=self.text_msglist.yview)
+
+        self.sb.pack(side=RIGHT, fill=Y)
         self.text_msg = Text(self.frame_left_center)
+
         self.user_list = Text(self.frame_right, state='normal')
 
         self.button_sendmsg = Button(self.frame_left_bottom, bg="#00BFFF", fg="white",text='发送', command=self.send_message)
@@ -100,7 +101,6 @@ class ChatView(Frame):
         self.frame_left_top.grid(row=0, column=0, padx=2, pady=3)
         self.frame_left_center.grid(row=1, padx=2, pady=3)
         self.frame_left_bottom.grid(row=2, column=0)
-        self.scroll_frame.grid(row=0, column=1, padx=0)
         self.frame_right.grid(row=0, column=2, padx=2)
         self.frame_right_down.grid(row=1, column=2, padx=2, rowspan=2, pady=3)
         self.frame_left_top.grid_propagate(0)
@@ -108,11 +108,10 @@ class ChatView(Frame):
         self.frame_left_bottom.grid_propagate(0)
         self.frame_right.grid_propagate(0)
         self.frame_right_down.grid_propagate(0)
-        self.text_msglist.grid(row=0, column=0, sticky = E+W+S+N)
+        self.text_msglist.pack(side=LEFT, fill=BOTH)
         self.text_msg.grid()
         self.user_list.grid()
         self.avatar_view.grid()
-        self.sb.grid(row=0, column=1, sticky = E+W+S+N)
         self.button_sendmsg.grid(row=2, column=0)
         self.button_logout.grid(row=2, column=1)
         self.user_list.insert(END, "在线用户", 'orange')
@@ -150,13 +149,15 @@ class ChatView(Frame):
             self.text_msglist.insert(END, content, 'green')
             self.text_msglist.insert(END, msg.get_content(), 'black')
         self.app.logger.info('Update messages')
+        self.text_msglist.see(END)
         self.text_msglist.configure(state='disabled')
 
     def logout(self):
 
-        if tkMessageBox.askyesno('提示信息', '确认要退出吗？'):
+        if tkMessageBox.askyesno('提示信息', '确认要退出吗？', parent=self.app.root):
             print("logout")
             self.app.logout()
+
 
 class Application(object):
 
