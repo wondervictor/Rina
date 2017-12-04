@@ -12,13 +12,10 @@ from Tkinter import *
 from PIL import Image, ImageTk
 import tkMessageBox
 from client import Client
-from message import Message
 from log import Logger
 import time
 import threading
 import thread
-import sys
-from ScrolledText import ScrolledText
 
 
 class LoginView(Frame):
@@ -118,7 +115,6 @@ class ChatView(Frame):
         self.user_list.configure(state='disabled')
         self.text_msglist.configure(state='disabled')
 
-
     def send_message(self):
 
         content = self.text_msg.get("1.0", END)
@@ -217,7 +213,7 @@ class Application(object):
             self.client.update_message(update_message)
             self.client.update_users(update_users)
 
-            timer = threading.Timer(2, request_update)
+            timer = threading.Timer(1, request_update)
             timer.start()
 
         timer = threading.Timer(1, request_update)
@@ -249,10 +245,6 @@ class Application(object):
         self.client.logout(callback)
 
 
-def test():
-
+if __name__ == '__main__':
     app = Application()
     app.start()
-
-
-test()

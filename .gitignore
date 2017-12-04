@@ -46,3 +46,8 @@ CMakeCache.txt
 CMakeFiles
 Makefile
 *.cbp
+
+# Python
+.idea
+*.pyc
+
