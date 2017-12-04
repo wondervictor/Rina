@@ -54,6 +54,7 @@ class Client(object):
         self.socket.conn(server, port)
         self.logger.info('Conn Success')
         self.username = username
+        thread.start_new_thread(self.run_queue, ())
         while True:
 
             input_str = raw_input('>>>:')
@@ -178,7 +179,5 @@ class Client(object):
 def test():
 
     client = Client()
-    # client.start()
-    # client.login_start('0.0.0.0', int(sys.argv[1]), sys.argv[2])
+    client.login_start('0.0.0.0', int(sys.argv[1]), sys.argv[2])
 
-test()
