@@ -5,8 +5,8 @@
  * */
 
 
-#include "Thread.h"
-#include "../log/log.h"
+#include "./thread.h"
+#include "log.h"
 
 namespace Rina {
 

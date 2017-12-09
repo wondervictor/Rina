@@ -51,3 +51,5 @@ Makefile
 .idea
 *.pyc
 
+# Mac
+.DS_Store

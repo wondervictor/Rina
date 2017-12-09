@@ -3,28 +3,13 @@ Computer Networks Course Project
 
 ## Introduction
 
-## TODO
+Chatting Room based on socket and TCP
 
-**1.Network**
+# Features
 
-- [x] Socket
-
-- [ ] Central Server
-
-- [ ] Client
-
-**2. Thread**
-
-- [ ] Thread Class
-
-**3.Graphic User Interface**
-
-- [ ] Login
-
-- [ ] Chatting
-
-- [ ] Online List
-
+1. Client can process many tasks in the meantime (Multi-thread)
+2. Request Queue
+3. Sever can work with high concurrency
 
 ## Licence
 

@@ -5,7 +5,7 @@
  * */
 
 #include "server.h"
-#include "../log/log.h"
+#include "log.h"
 #include <cstring>
 #include <string>
 #include <arpa/inet.h>

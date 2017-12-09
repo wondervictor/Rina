@@ -11,9 +11,9 @@
 
 #include <map>
 #include <vector>
-#include "Socket.h"
-#include "Thread.h"
-#include "Model.h"
+#include "./socket.h"
+#include "./thread.h"
+#include "model.h"
 
 
 namespace Rina {

@@ -5,10 +5,10 @@
  * */
 
 
-#include "./Socket.h"
+#include "./socket.h"
 #include <iostream>
 #include <cstring>
-#include "../log/log.h"
+#include "log.h"
 
 
 

@@ -9,9 +9,9 @@
 #ifndef RINA_CLIENT_H
 #define RINA_CLIENT_H
 #include <string>
-#include "Socket.h"
+#include "./socket.h"
 #include "Thread.h"
-#include "Model.h"
+#include "model.h"
 
 
 namespace Rina {

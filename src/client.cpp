@@ -6,7 +6,7 @@
 
 
 #include "client.h"
-#include "../log/log.h"
+#include "log.h"
 #include <string.h>
 #include <iostream>
 

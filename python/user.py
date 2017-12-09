@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from enum import Enum, unique
+from enum import Enum
 
-@unique
 class UserState(Enum):
 
     Online = 0

@@ -6,7 +6,7 @@
 
 #include <string>
 #include <vector>
-#include "Thread.h"
+#include "./thread.h"
 
 
 struct message {

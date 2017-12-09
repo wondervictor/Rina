@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-
 """
 Content: Main View
 Author: Vic Chan

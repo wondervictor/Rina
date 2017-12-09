@@ -4,7 +4,7 @@
  * @date 2017-10-30
  * */
 
-#include "Model.h"
+#include "model.h"
 #include "rapidjson/rapidjson.h"
 #include "rapidjson/document.h"
 #include "rapidjson/stringbuffer.h"

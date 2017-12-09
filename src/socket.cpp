@@ -16,7 +16,7 @@
 
 #define MAX_BUF_SIZE 1024
 
-#include "../log/log.h"
+#include "log.h"
 
 namespace Rina {
 
