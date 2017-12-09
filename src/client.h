@@ -10,7 +10,7 @@
 #define RINA_CLIENT_H
 #include <string>
 #include "./socket.h"
-#include "Thread.h"
+#include "./thread.h"
 #include "model.h"
 
 
